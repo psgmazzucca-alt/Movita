@@ -304,7 +304,6 @@ fieldset:disabled {
     const saladOptionsDiv = document.getElementById('salad-options');
     const saladSummarySelection = document.getElementById('salad-summary-selection'); // Novo!
     const selectedSaladNameSummary = document.getElementById('selected-salad-name-summary'); // Novo!
-    // const selectedSaladMolhoSummary = document.getElementById('selected-salad-molho-summary'); // Removido do JS, pois o texto é fixo
     const selectedSaladDetailsSummary = document.getElementById('selected-salad-details-summary'); // Novo!
     const saladDetailsDiv = document.getElementById('salad-details');
     const adicionalOptionsDiv = document.getElementById('adicional-options');
@@ -448,7 +447,6 @@ fieldset:disabled {
         
         // 4. Atualiza e mostra o novo container de resumo
         selectedSaladNameSummary.textContent = newSalad.nome;
-        // selectedSaladMolhoSummary.textContent = newSalad.molho; // Removido do JS, pois o texto é fixo no HTML
         selectedSaladDetailsSummary.textContent = newSalad.detalhes;
         saladSummarySelection.style.display = 'block';
         
@@ -527,7 +525,7 @@ fieldset:disabled {
             type: 'salad',
             nome: selectedSalad.nome,
             price: currentSaladPrice,
-            molho: saladMolho, // O molho real é armazenado aqui para ir no WhatsApp
+            molho: saladMolho, // O molho real é armazenado aqui para ir no WhatsApp (se necessário, mas não é usado na mensagem final)
             adicionais: adicionais,
             obs: document.getElementById('salad-obs').value.trim()
         };
@@ -718,7 +716,7 @@ fieldset:disabled {
                     
                     itemDetails = `
                         <h3 class="font-bold text-gray-800">#${index + 1} - Salada ${item.nome}</h3>
-                        <p class="text-sm text-gray-600">Molho Especial: ${item.molho}</p> 
+                        <p class="text-sm text-gray-600">Molho: Molho Especial da Casa</p> 
                         <p class="text-sm text-gray-600">Adicionais: ${adicionaisList}</p>
                     `;
                 }
@@ -771,7 +769,7 @@ fieldset:disabled {
         document.getElementById('final-total').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
     }
 
-    // Função de Geração de Link (Mantida)
+    // Função de Geração de Link (CORRIGIDA)
     function generateWhatsAppLink() {
         const nome = document.getElementById('nome').value.trim();
         const telefone = document.getElementById('telefone').value.trim();
@@ -813,8 +811,8 @@ fieldset:disabled {
                 message += `*-> Acompanhamentos: ${acompList}*\n`;
             } else if (item.type === 'salad') {
                 const adicionaisList = item.adicionais.length > 0 ? item.adicionais.join(' | ') : 'Nenhum';
-                // Molho Especial AGORA MOSTRA O NOME REAL do molho para a cozinha
-                message += `*-> Molho Especial: ${item.molho}*\n`; 
+                // CORREÇÃO FINAL APLICADA AQUI: Apenas o termo genérico no pedido
+                message += `*-> Molho Especial da Casa*\n`; 
                 message += `*-> Adicionais: ${adicionaisList}*\n`;
             }
 
