@@ -9,29 +9,53 @@
 body {
     font-family: 'Inter', sans-serif;
     background-color: #f4f7f9;
-    /* Removido CSS que estava causando problemas de layout, confiando no Tailwind */
 }
 .section-title {
     /* Cor de título alterada para um tom de verde/oliva mais escuro */
     @apply text-xl font-bold border-b-2 pb-2 mb-4 text-[#4a5540] border-[#aec6a2];
 }
-/* ... (Restante do CSS) ... */
 .input-style {
     /* Cor de foco alterada para o verde/oliva */
     @apply w-full p-3 border border-gray-300 rounded-lg focus:ring-[#4a5540] focus:border-[#4a5540] transition duration-150;
 }
-/* ... (Restante do CSS) ... */
+/* Estilo para item desabilitado visualmente */
+.acomp-option input:disabled + span,
+.input-style:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #f3f4f6;
+    text-decoration: line-through;
+}
+/* Estilo para fieldset desabilitado (opcional, para reforçar) */
+fieldset:disabled {
+    pointer-events: none; /* Impede cliques */
+    opacity: 0.7; /* Suaviza a cor */
+}
+
+/* Adicionando sombra ao texto para que fique legível sobre o fundo */
+.flag-text-shadow {
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+}
+/* Cor de fundo verde oliva claro */
+.movita-bg {
+    background-color: #aec6a2; /* Verde Oliva Claro */
+}
+/* Estilo para o input de quantidade de bebida (AGORA SEM USO) */
+.drink-input {
+    @apply w-16 p-2 text-center border border-gray-300 rounded-lg;
+}
 </style>
 </head>
-<body class="min-h-screen px-6 py-4 flex justify-center">
+<body class="min-h-screen p-4 flex justify-center">
 
 <div id="app" class="w-full max-w-xl bg-white shadow-2xl rounded-xl space-y-6 md:p-0">
     <header class="text-center relative movita-bg rounded-t-xl py-6 shadow-2xl">
         <img src="https://i.postimg.cc/ht6ZFPyk/Black-White-Minimal-Modern-Simple-Bold-Business-Mag-Logo-1.png" 
+             alt="Logo Movita" 
              class="w-40 h-40 object-cover mx-auto rounded-full mb-3 shadow-2xl border-4 border-white z-10 relative">
         <div class="px-2">
             <h1 class="text-4xl font-extrabold text-white sm:text-5xl flag-text-shadow leading-tight">MOVITA</h1>
-            <p class="text-base text-white font-medium mt-1 flag-text-shadow">MOVIMENTO COM PROPÓSITO | Monte seu Kebab</p>
+            <p class="text-base text-white font-medium mt-1 flag-text-shadow">MOVIMENTO COM PROPÓSITO</p>
         </div>
     </header>
 
@@ -56,6 +80,12 @@ body {
                     <label class="block font-semibold text-gray-700">🧂 3. Escolha até 2 Molhos (Obrigatório)</label>
                     <div id="molho-options" class="space-y-1"></div>
                 </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block font-semibold text-gray-700">🥗 4. Escolha até 4 Acompanhamentos (Obrigatório)</label>
+                <p id="acomp-counter" class="text-sm font-medium text-[#4a5540]">Selecionados: 0/4</p>
+                <div id="acomp-options" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
             </div>
             
             <div class="space-y-2">
@@ -142,10 +172,10 @@ body {
 </div>
 
 <script>
-    // --- FUNÇÕES JAVASCRIPT (MANTIDAS INTACTAS) ---
+    // --- DADOS DO CARDÁPIO (FONTE ÚNICA DE VERDADE) ---
     const MENU = {
         proteinas: ["Frango", "Carne", "Atum"], 
-        molhos: ["Barbecue", "Maionese Verde", "Mostarda Amarela", "Ketchup", "Maionese de Alho", "Cream Ceese", "Molho Rosê"],
+        molhos: ["Barbecue", "Maionese Verde", "Mostarda Amarela", "Ketchup", "Maionese de Alho", "Cream Ceese", "Molho Rosé"],
         maxMolhos: 2, 
         acompanhamentos: [
             "Alface", "Tomate", "Pepino", "Rúcula", "Cebola Roxa", 
@@ -163,6 +193,7 @@ body {
         }
     };
 
+    // --- ESTADO GLOBAL ---
     let cart = []; 
     let currentItemPrice = MENU.tamanhos[0].preco;
     let premiumPrice = 0; 
@@ -171,6 +202,7 @@ body {
     let selectedMolhos = 0;
     let maxMolhos = MENU.maxMolhos;
 
+    // --- REFERÊNCIAS DOM ---
     const sizeOptionsDiv = document.getElementById('size-options');
     const molhoOptionsDiv = document.getElementById('molho-options');
     const acompOptionsDiv = document.getElementById('acomp-options');
@@ -184,6 +216,8 @@ body {
     const trocoInputContainer = document.getElementById('troco-input-container'); 
     const paymentMethodSelect = document.getElementById('payment-method');
     const proteinOptionsDiv = document.getElementById('protein-options');
+
+    // --- FUNÇÕES DE LÓGICA E RENDERIZAÇÃO INICIAL ---
 
     function renderOptions(container, name, options, type = 'radio', checkedValue = null, isSizeOption = false) {
         container.innerHTML = options.map((option, index) => {
@@ -358,6 +392,8 @@ body {
         updateLimitAndPrice(); 
     }
 
+    // --- FUNÇÕES DE CARRINHO E TOTALIZAÇÃO ---
+
     function renderCart() {
         cartList.innerHTML = '';
         let subtotalPratos = 0;
@@ -507,6 +543,7 @@ body {
         }, 1000);
     }
     
+    // --- FUNÇÕES AUXILIARES (Modal Simples) ---
     function showModal(message, bgColor) {
         const modal = document.createElement('div');
         modal.className = `fixed top-0 left-0 right-0 z-50 p-4 text-center text-white font-bold ${bgColor} shadow-lg`;
@@ -519,6 +556,7 @@ body {
 
     // Inicialização
     window.onload = setupUI;
+    // Exporta funções para uso global (inline onclick, onchange)
     window.addToCart = addToCart;
     window.removeItem = removeItem;
     window.generateWhatsAppLink = generateWhatsAppLink;
