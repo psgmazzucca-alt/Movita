@@ -2,7 +2,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Movita - Monte Seu Kebab</title>
+<title> - Monte Seu Kebab</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -58,7 +58,7 @@ fieldset:disabled {
              class="w-40 h-40 object-cover mx-auto rounded-full mb-3 shadow-2xl border-4 border-white z-10 relative">
         <div class="px-2">
             <h1 class="text-4xl font-extrabold text-white sm:text-5xl flag-text-shadow leading-tight">MOVITA</h1>
-            <p class="text-base text-white font-medium mt-1 flag-text-shadow">MOVIMENTO COM PROPÓSITO | Monte seu Kebab</p>
+            <p class="text-base text-white font-medium mt-1 flag-text-shadow">MOVIMENTO COM PROPÓSITO</p>
         </div>
     </header>
 
