@@ -41,43 +41,26 @@ fieldset:disabled {
     background-color: #aec6a2; /* Verde Oliva Claro */
 }
 /* ------------------------------------------------------------------ */
-/* ESTILOS DE CARTÃO E MARCADORES (RADIO/CHECKBOX CUSTOMIZADOS) */
+/* ESTILOS DE CARTÃO E MARCADORES (RADIO/CHECKBOX UNIFICADOS) */
 /* ------------------------------------------------------------------ */
 
-/* Estilo Base para todos os itens de menu selecionáveis (Saladas, Adicionais, Molhos de Salada) */
+/* Estilo Base para todos os itens de menu selecionáveis */
 .menu-item-card {
+    /* Tornando o card Flex para que o radio/checkbox fique alinhado */
     @apply p-3 border border-gray-200 bg-white rounded-lg shadow-sm cursor-pointer transition duration-150 flex items-start; 
 }
 .menu-item-card.selected {
+    /* Borda e cor de seleção uniforme para Kebab e Salada */
     @apply ring-2 ring-offset-1 ring-[#4a5540] border-[#4a5540] bg-[#f7fcf6];
 }
 
-/* Marcardor para Rádio (Saladas) */
-.custom-radio-marker {
-    @apply w-5 h-5 rounded-full border-2 border-gray-400 mr-3 mt-1 flex-shrink-0;
-}
-/* Estilo de seleção para o Rádio */
-.menu-item-card.selected .custom-radio-marker {
-    @apply border-[#4a5540] bg-[#4a5540] relative;
-}
-.menu-item-card.selected .custom-radio-marker::after {
-    content: '';
-    @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white;
+/* Os inputs de rádio e checkbox (tanto Kebab quanto Salada) devem usar o estilo nativo */
+.salad-input {
+    /* Classes de rádio/checkbox do Tailwind Form, com cor verde/oliva */
+    @apply form-radio text-green-600 mr-2 mt-1 flex-shrink-0;
 }
 
-/* NOVO: Marcador para Checkbox (Adicionais) */
-.custom-checkbox-marker {
-    @apply w-5 h-5 rounded border-2 border-gray-400 mr-2 flex-shrink-0 flex items-center justify-center;
-}
-/* Estilo de seleção para o Checkbox */
-.menu-item-card.selected .custom-checkbox-marker {
-    @apply border-blue-600 bg-blue-600 relative;
-}
-.menu-item-card.selected .custom-checkbox-marker::after {
-    content: '✓';
-    @apply text-white text-xs font-bold leading-none;
-}
-/* ------------------------------------------------------------------ */
+/* REMOVIDO: .custom-radio-marker e seu estilo (Para unificar visual) */
 
 </style>
 </head>
@@ -95,38 +78,6 @@ fieldset:disabled {
     </header>
 
     <div class="p-6 space-y-6 md:p-8 pt-0">
-        
-        <section id="salad-order-section" class="space-y-6 p-4 border border-[#e1eef0] rounded-xl bg-[#f6fcf7]">
-            <h2 class="section-title text-[#4a5540]">🥗 Escolha Sua Salada</h2>
-
-            <div id="salad-options" class="space-y-3">
-                </div>
-
-            <div id="salad-details" style="display: none;" class="space-y-4 p-3 border rounded-lg bg-gray-50">
-                 <h3 class="font-bold text-lg text-[#4a5540]">Personalize a <span id="selected-salad-name"></span>:</h3>
-                 <p class="text-md font-semibold text-gray-700">Acompanha: <span id="selected-salad-molho" class="text-blue-600 font-bold">Molho Especial</span></p>
-                 
-                 <div class="space-y-2">
-                    <label class="block font-semibold text-gray-700">➕ Adicionais (Opcional)</label>
-                    <div id="adicional-options" class="grid grid-cols-2 gap-2">
-                        </div>
-                 </div>
-
-                 <div class="space-y-2">
-                    <label for="salad-obs" class="block font-semibold text-gray-700">Observações (Ex: Molho à parte, Sem cebola)</label>
-                    <input type="text" id="salad-obs" class="input-style" placeholder="Digite aqui...">
-                 </div>
-
-                 <p class="text-2xl font-extrabold text-green-700 mt-4 text-right">
-                    Preço da Salada: <span id="salad-price-display">R$ 0,00</span>
-                 </p>
-
-                 <button id="add-salad-to-cart-btn" onclick="addSaladToCart()" 
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md transition duration-300 transform hover:scale-[1.01] active:scale-[0.98]">
-                    ADICIONAR SALADA AO CARRINHO
-                 </button>
-            </div>
-        </section>
         
         <section id="custom-order-section" class="space-y-6 p-4 border border-[#e5f0e1] rounded-xl bg-[#f7fcf6]">
             <h2 class="section-title text-[#4a5540]">🥙 Monte Seu Kebab</h2>
@@ -168,6 +119,38 @@ fieldset:disabled {
                 ADICIONAR PRATO AO CARRINHO E MONTAR OUTRO
             </button>
         </section>
+        <section id="salad-order-section" class="space-y-6 p-4 border border-[#e1eef0] rounded-xl bg-[#f6fcf7]">
+            <h2 class="section-title text-[#4a5540]">🥗 Escolha Sua Salada</h2>
+
+            <div id="salad-options" class="space-y-3">
+                </div>
+
+            <div id="salad-details" style="display: none;" class="space-y-4 p-3 border rounded-lg bg-gray-50">
+                 <h3 class="font-bold text-lg text-[#4a5540]">Personalize a <span id="selected-salad-name"></span>:</h3>
+                 <p class="text-md font-semibold text-gray-700">Acompanha: <span id="selected-salad-molho" class="text-blue-600 font-bold">Molho Especial</span></p>
+                 
+                 <div class="space-y-2">
+                    <label class="block font-semibold text-gray-700">➕ Adicionais (Opcional)</label>
+                    <div id="adicional-options" class="grid grid-cols-2 gap-2">
+                        </div>
+                 </div>
+
+                 <div class="space-y-2">
+                    <label for="salad-obs" class="block font-semibold text-gray-700">Observações (Ex: Molho à parte, Sem cebola)</label>
+                    <input type="text" id="salad-obs" class="input-style" placeholder="Digite aqui...">
+                 </div>
+
+                 <p class="text-2xl font-extrabold text-green-700 mt-4 text-right">
+                    Preço da Salada: <span id="salad-price-display">R$ 0,00</span>
+                 </p>
+
+                 <button id="add-salad-to-cart-btn" onclick="addSaladToCart()" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md transition duration-300 transform hover:scale-[1.01] active:scale-[0.98]">
+                    ADICIONAR SALADA AO CARRINHO
+                 </button>
+            </div>
+        </section>
+        
         <section class="space-y-4 p-4 border border-gray-200 rounded-xl bg-gray-50">
             <h2 class="section-title text-gray-700 border-gray-200">🛒 Seu Pedido (<span id="cart-count">0</span> Pratos)</h2>
             <ul id="cart-list" class="space-y-3">
@@ -325,6 +308,7 @@ fieldset:disabled {
 
     // Função auxiliar para renderizar opções (Radio ou Checkbox)
     function renderOptions(container, name, options, type = 'radio', checkedValue = null, isSizeOption = false) {
+        // Esta função renderiza Kebab (Tamanho, Proteína, Molhos, Acompanhamentos)
         container.innerHTML = options.map((option, index) => {
             const value = isSizeOption ? option.id : option;
             let labelText = isSizeOption 
@@ -337,62 +321,68 @@ fieldset:disabled {
 
             const isChecked = checkedValue ? (value === checkedValue) : (index === 0 && !isSizeOption && type === 'radio');
             
-            // Layout mais simples para Molhos e Acompanhamentos
-            const labelClasses = type === 'checkbox' && name !== 'adicional' ? 'flex items-center p-3 bg-white rounded-lg shadow-md hover:bg-[#f7fcf6] transition duration-150 flex-1 cursor-pointer acomp-option' : 'flex items-center p-3 bg-white rounded-lg shadow-md hover:bg-[#f7fcf6] transition duration-150 flex-1 cursor-pointer';
+            // Layout de cartão para Kebab
+            const labelClasses = 'flex items-center p-3 bg-white rounded-lg shadow-md hover:bg-[#f7fcf6] transition duration-150 flex-1 cursor-pointer acomp-option';
 
             return `
                 <label class="${labelClasses}">
                     <input type="${type}" name="${name}" value="${value}" 
                         class="${type === 'radio' ? 'form-radio text-green-600' : 'form-checkbox text-green-600'}"
-                        ${isChecked ? 'checked' : ''}>
+                        ${isChecked ? 'checked' : ''}
+                        onchange="${type === 'checkbox' ? 'this.closest(\'.acomp-option\').classList.toggle(\'selected\', this.checked);' : ''}">
                     <span class="ml-2 font-medium">${labelText}</span>
                 </label>
             `;
         }).join('');
+        
+        // Corrige a marcação inicial dos checkboxes/radios do Kebab
+        document.querySelectorAll(`input[name="${name}"]:checked`).forEach(cb => {
+            cb.closest('label').classList.add('selected');
+        });
     }
     
-    // Renderiza as opções de Salada (SEM O DETALHE DO MOLHO NA OPÇÃO)
+    // Renderiza as opções de Salada (AGORA UNIFICADA com estilo Kebab/Radio Nativo)
     function renderSaladOptions() {
         saladOptionsDiv.innerHTML = MENU.saladas.map(salad => `
-            <div class="menu-item-card" data-salad-id="${salad.id}" onclick="selectSalad('${salad.id}')">
-                <div class="custom-radio-marker"></div>
-                <div class="flex-1">
+            <label class="menu-item-card salad-option-card" data-salad-id="${salad.id}" data-price="${salad.preco}">
+                <input type="radio" name="salad" value="${salad.id}" 
+                       class="salad-input"
+                       onclick="selectSalad('${salad.id}'); this.closest('.salad-option-card').classList.add('selected');">
+                
+                <div class="flex-1 ml-2">
                     <div class="flex justify-between items-start">
                         <h3 class="font-bold text-gray-800">${salad.nome}</h3>
                         <span class="font-extrabold text-lg text-green-700">R$ ${salad.preco.toFixed(2).replace('.', ',')}</span>
                     </div>
                     <p class="text-sm text-gray-500 mt-1">${salad.detalhes}</p>
-                    <p class="text-xs font-semibold text-blue-500 mt-1">Acompanha Molho Especial.</p>
+                    <p class="text-xs font-semibold text-blue-500 mt-1">Acompanha Molho: ${salad.molho}</p>
                 </div>
-            </div>
+            </label>
         `).join('');
     }
 
-    // Renderiza as opções de Adicionais (Mantida)
+    // Renderiza as opções de Adicionais (Mantida e Corrigida)
     function renderAdicionalOptions() {
         const adicionalHtml = MENU.adicionais.map(adicional => `
-            <div class="menu-item-card adicional-card" data-adicional-id="${adicional.id}" data-price="${adicional.preco}" onclick="toggleAdicional('${adicional.id}')">
-                <div class="custom-checkbox-marker"></div>
-                <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-700">${adicional.nome}</p>
-                    <span class="text-xs text-blue-600 font-bold">(+ R$ ${adicional.preco.toFixed(2).replace('.', ',')})</span>
+            <label class="menu-item-card adicional-card" data-adicional-id="${adicional.id}" data-price="${adicional.preco}">
+                
+                <input type="checkbox" name="adicional" value="${adicional.nome}" 
+                       data-price="${adicional.preco}" data-id="${adicional.id}" 
+                       class="salad-input form-checkbox" 
+                       onchange="updateSaladPrice(); this.closest('.adicional-card').classList.toggle('selected', this.checked);">
+                
+                <div class="flex-1 ml-2">
+                    <div class="flex justify-between items-start w-full">
+                        <p class="font-medium text-gray-700">${adicional.nome}</p>
+                        <span class="text-sm text-blue-600 font-bold">(+ R$ ${adicional.preco.toFixed(2).replace('.', ',')})</span>
+                    </div>
                 </div>
-                <input type="checkbox" name="adicional" value="${adicional.nome}" data-price="${adicional.preco}" data-id="${adicional.id}" class="hidden">
-            </div>
+            </label>
         `).join('');
         adicionalOptionsDiv.innerHTML = adicionalHtml;
-    }
-    
-    // Função para alternar o adicional e atualizar o preço (Mantida)
-    function toggleAdicional(adicionalId) {
-        const card = document.querySelector(`.adicional-card[data-adicional-id="${adicionalId}"]`);
-        const checkbox = card.querySelector(`input[data-id="${adicionalId}"]`);
         
-        checkbox.checked = !checkbox.checked;
-
-        card.classList.toggle('selected', checkbox.checked);
-
-        updateSaladPrice();
+        // Garante que o estado inicial (limpo) esteja correto
+        document.querySelectorAll('.adicional-card').forEach(card => card.classList.remove('selected'));
     }
     
     // Função de Inicialização (Mantida)
@@ -418,12 +408,12 @@ fieldset:disabled {
         toggleTrocoField(); 
     }
     
-    // Lógica de Seleção de Salada (ATUALIZADA: Não exibe o nome do molho nos detalhes)
+    // Lógica de Seleção de Salada (ATUALIZADA para lidar com radio buttons)
     function selectSalad(saladId) {
         const newSalad = MENU.saladas.find(s => s.id === saladId);
 
-        // Remove a seleção anterior
-        document.querySelectorAll('.menu-item-card').forEach(card => card.classList.remove('selected'));
+        // Remove a seleção anterior de TODOS os cartões de Salada Principal
+        document.querySelectorAll('.salad-option-card').forEach(card => card.classList.remove('selected'));
         
         // Adiciona a seleção ao card clicado
         const selectedCard = document.querySelector(`[data-salad-id="${saladId}"]`);
@@ -435,10 +425,10 @@ fieldset:disabled {
         
         // Atualiza a interface
         selectedSaladName.textContent = newSalad.nome;
-        selectedSaladMolho.textContent = newSalad.molho; // Apenas armazena, mas o texto do HTML já é "Molho Especial"
+        selectedSaladMolho.textContent = newSalad.molho; 
         saladDetailsDiv.style.display = 'block';
         
-        // Reinicia os adicionais 
+        // Reinicia os adicionais (limpando o visual e o estado)
         document.querySelectorAll('.adicional-card').forEach(card => card.classList.remove('selected'));
         document.querySelectorAll('input[name="adicional"]').forEach(cb => cb.checked = false);
         
@@ -457,7 +447,7 @@ fieldset:disabled {
         let basePrice = selectedSalad.preco;
         let adicionalPrice = 0;
 
-        // Busca o preço pelos checkboxes hidden
+        // Busca o preço pelos checkboxes
         document.querySelectorAll('input[name="adicional"]:checked').forEach(cb => {
             adicionalPrice += parseFloat(cb.dataset.price);
         });
@@ -499,7 +489,11 @@ fieldset:disabled {
         // Reset da Salada
         selectedSalad = null;
         saladDetailsDiv.style.display = 'none';
-        document.querySelectorAll('.menu-item-card').forEach(card => card.classList.remove('selected'));
+        document.querySelectorAll('.salad-option-card').forEach(card => card.classList.remove('selected'));
+        document.querySelectorAll('input[name="salad"]').forEach(radio => radio.checked = false);
+        
+        // Re-renderiza os adicionais para limpar as opções (e o estado visual de 'selected')
+        renderAdicionalOptions();
         
         document.getElementById('checkout-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
@@ -544,6 +538,11 @@ fieldset:disabled {
                 cb.closest('label').classList.remove('opacity-50');
             }
         });
+        
+        // Garante que a classe 'selected' do cartão seja atualizada
+        document.querySelectorAll('input[name="molho"]').forEach(cb => {
+            cb.closest('label').classList.toggle('selected', cb.checked);
+        });
     }
 
     function updateItemPrice() {
@@ -572,6 +571,9 @@ fieldset:disabled {
                 cb.disabled = false;
                 cb.closest('label').classList.remove('opacity-50');
             }
+            
+            // Garante que a classe 'selected' do cartão seja atualizada
+            cb.closest('label').classList.toggle('selected', cb.checked);
         });
     }
 
@@ -626,8 +628,14 @@ fieldset:disabled {
     
     function resetForm() {
         document.querySelectorAll('input[name="proteina"]').forEach(r => r.checked = false); 
-        document.querySelectorAll('input[name="molho"]').forEach(cb => cb.checked = false); 
-        document.querySelectorAll('input[name="acomp"]').forEach(cb => cb.checked = false);
+        document.querySelectorAll('input[name="molho"]').forEach(cb => {
+            cb.checked = false;
+            cb.closest('label').classList.remove('selected'); // Limpa o visual do cartão
+        }); 
+        document.querySelectorAll('input[name="acomp"]').forEach(cb => {
+            cb.checked = false;
+            cb.closest('label').classList.remove('selected'); // Limpa o visual do cartão
+        });
         document.getElementById('obs').value = '';
 
         updateMolhoCount(); 
@@ -829,10 +837,10 @@ fieldset:disabled {
     window.addToCart = addToCart;
     window.addSaladToCart = addSaladToCart; 
     window.selectSalad = selectSalad; 
-    window.toggleAdicional = toggleAdicional; 
     window.removeItem = removeItem;
     window.generateWhatsAppLink = generateWhatsAppLink;
     window.toggleTrocoField = toggleTrocoField;
+    window.updateSaladPrice = updateSaladPrice; // Mantém para uso no onchange
 </script>
 </body>
 </html>
