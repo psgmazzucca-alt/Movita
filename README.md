@@ -9,6 +9,9 @@
 body {
     font-family: 'Inter', sans-serif;
     background-color: #f4f7f9;
+    /* CORREÇÃO: Impede a rolagem horizontal indesejada */
+    overflow-x: hidden; 
+    width: 100%;
 }
 .section-title {
     /* Cor de título alterada para um tom de verde/oliva mais escuro */
@@ -50,12 +53,12 @@ fieldset:disabled {
 
 <div id="app" class="w-full max-w-xl bg-white shadow-2xl rounded-xl space-y-6 md:p-0">
     <header class="text-center relative movita-bg rounded-t-xl py-6 shadow-2xl">
-        <img src="https://i.postimg.cc/ht6ZFPyk/Black-White-Minimal-Modern-Simple-Bold-Business-Mag-Logo-1.png" 
+        <img src="https://i.postimg.cc/prk8G3cV/Imagem-do-Whats-App-de-2025-10-01-s-01-45-52-b1184834.jpg" 
              alt="Logo Movita" 
              class="w-40 h-40 object-cover mx-auto rounded-full mb-3 shadow-2xl border-4 border-white z-10 relative">
         <div class="px-2">
             <h1 class="text-4xl font-extrabold text-white sm:text-5xl flag-text-shadow leading-tight">MOVITA</h1>
-            <p class="text-base text-white font-medium mt-1 flag-text-shadow">MOVIMENTO COM PROPÓSITO</p>
+            <p class="text-base text-white font-medium mt-1 flag-text-shadow">MOVIMENTO COM PROPÓSITO | Monte seu Kebab</p>
         </div>
     </header>
 
@@ -175,7 +178,7 @@ fieldset:disabled {
     // --- DADOS DO CARDÁPIO (FONTE ÚNICA DE VERDADE) ---
     const MENU = {
         proteinas: ["Frango", "Carne", "Atum"], 
-        molhos: ["Barbecue", "Maionese Verde", "Mostarda Amarela", "Ketchup", "Maionese de Alho", "Cream Ceese", "Molho Rosé"],
+        molhos: ["Barbecue", "Maionese Verde", "Mostarda Amarela", "Ketchup", "Maionese de Alho", "Cream Ceese", "Molho Rosê"],
         maxMolhos: 2, 
         acompanhamentos: [
             "Alface", "Tomate", "Pepino", "Rúcula", "Cebola Roxa", 
