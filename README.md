@@ -2,7 +2,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Movita - Monte Seu Kebab</title>
+<title>Movita - Monte Seu Kebab e Saladas</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -40,10 +40,26 @@ fieldset:disabled {
 .movita-bg {
     background-color: #aec6a2; /* Verde Oliva Claro */
 }
-/* Estilo para o input de quantidade de bebida (AGORA SEM USO) */
-.drink-input {
-    @apply w-16 p-2 text-center border border-gray-300 rounded-lg;
+/* Estilo para item de menu selecionado */
+.menu-item-card {
+    /* Novo estilo com radio customizado na frente */
+    @apply p-3 border border-gray-200 bg-white rounded-lg shadow-sm cursor-pointer transition duration-150 flex items-start; 
 }
+.menu-item-card.selected {
+    @apply ring-2 ring-offset-1 ring-[#4a5540] border-[#4a5540] bg-[#f7fcf6];
+}
+/* Estilo para o radio/marcador customizado */
+.custom-radio-marker {
+    @apply w-5 h-5 rounded-full border-2 border-gray-400 mr-3 mt-1 flex-shrink-0;
+}
+.menu-item-card.selected .custom-radio-marker {
+    @apply border-[#4a5540] bg-[#4a5540] relative;
+}
+.menu-item-card.selected .custom-radio-marker::after {
+    content: '';
+    @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white;
+}
+
 </style>
 </head>
 <body class="min-h-screen p-4 flex justify-center">
@@ -60,6 +76,43 @@ fieldset:disabled {
     </header>
 
     <div class="p-6 space-y-6 md:p-8 pt-0">
+        
+        <section id="salad-order-section" class="space-y-6 p-4 border border-[#e1eef0] rounded-xl bg-[#f6fcf7]">
+            <h2 class="section-title text-[#4a5540]">🥗 Escolha Sua Salada</h2>
+
+            <div id="salad-options" class="space-y-3">
+                </div>
+
+            <div id="salad-details" style="display: none;" class="space-y-4 p-3 border rounded-lg bg-gray-50">
+                 <h3 class="font-bold text-lg text-[#4a5540]">Personalize a <span id="selected-salad-name"></span>:</h3>
+                 
+                 <div class="space-y-2">
+                    <label class="block font-semibold text-gray-700">➕ Adicionais (Opcional)</label>
+                    <div id="adicional-options" class="grid grid-cols-2 gap-2">
+                        </div>
+                 </div>
+
+                 <div class="space-y-2">
+                    <label class="block font-semibold text-gray-700">🧂 Molho para Salada (Obrigatório)</label>
+                    <div id="salad-molho-options" class="space-y-1">
+                        </div>
+                 </div>
+
+                 <div class="space-y-2">
+                    <label for="salad-obs" class="block font-semibold text-gray-700">Observações (Ex: Sem cebola, Molho à parte)</label>
+                    <input type="text" id="salad-obs" class="input-style" placeholder="Digite aqui...">
+                 </div>
+
+                 <p class="text-2xl font-extrabold text-green-700 mt-4 text-right">
+                    Preço da Salada: <span id="salad-price-display">R$ 0,00</span>
+                 </p>
+
+                 <button id="add-salad-to-cart-btn" onclick="addSaladToCart()" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md transition duration-300 transform hover:scale-[1.01] active:scale-[0.98]">
+                    ADICIONAR SALADA AO CARRINHO
+                 </button>
+            </div>
+        </section>
         
         <section id="custom-order-section" class="space-y-6 p-4 border border-[#e5f0e1] rounded-xl bg-[#f7fcf6]">
             <h2 class="section-title text-[#4a5540]">🥙 Monte Seu Kebab</h2>
@@ -101,7 +154,6 @@ fieldset:disabled {
                 ADICIONAR PRATO AO CARRINHO E MONTAR OUTRO
             </button>
         </section>
-
         <section class="space-y-4 p-4 border border-gray-200 rounded-xl bg-gray-50">
             <h2 class="section-title text-gray-700 border-gray-200">🛒 Seu Pedido (<span id="cart-count">0</span> Pratos)</h2>
             <ul id="cart-list" class="space-y-3">
@@ -139,7 +191,8 @@ fieldset:disabled {
             
             <div class="space-y-2">
                 <label class="block font-semibold text-gray-700">Forma de Pagamento</label>
-                <select id="payment-method" class="input-style" onchange="toggleTrocoField()"> <option value="Pix">Pix (Informar na mensagem)</option>
+                <select id="payment-method" class="input-style" onchange="toggleTrocoField()"> 
+                    <option value="Pix">Pix (Informar na mensagem)</option>
                     <option value="Dinheiro">Dinheiro (Precisa de troco?)</option>
                     <option value="Cartao-Debito">Cartão de Débito</option>
                     <option value="Cartao-Credito">Cartão de Crédito</option>
@@ -174,6 +227,7 @@ fieldset:disabled {
 <script>
     // --- DADOS DO CARDÁPIO (FONTE ÚNICA DE VERDADE) ---
     const MENU = {
+        // Dados do KEBAB (Existentes)
         proteinas: ["Frango", "Carne", "Atum"], 
         molhos: ["Barbecue", "Maionese Verde", "Mostarda Amarela", "Ketchup", "Maionese de Alho", "Cream Ceese", "Molho Rosé"],
         maxMolhos: 2, 
@@ -186,6 +240,25 @@ fieldset:disabled {
             { id: 'M', nome: 'Médio', preco: 21.90, limite: 4 },
             { id: 'G', nome: 'Grande', preco: 25.90, limite: 4 }
         ],
+        
+        // Dados das SALADAS (NOVOS)
+        saladas: [
+            { id: 'origem', nome: 'ORIGEM', preco: 26.90, detalhes: 'Macarrão penne, alface americano, tomate cereja, cebola roxa, milho, cenoura ralada, salsinha. Proteína: tiras de frango ou atum.' },
+            { id: 'crockfit', nome: 'CROCK FIT', preco: 26.90, detalhes: 'Alface americano, pepino, tomate cereja, parmesão ralado, croutons. Proteína: tiras de frango.' },
+            { id: 'terramar', nome: 'TERRA E MAR', preco: 29.90, detalhes: 'Camarão, manga, alface crespa, rúcula, pepino, tomate cereja, milho. Proteína: camarão.' },
+            { id: 'tropicalia', nome: 'TROPICÁLIA (VEGETARIANA)', preco: 22.90, detalhes: 'Alface crespa, rúcula, tomate cereja, cebola roxa, morango.' },
+            { id: 'chefefit', nome: 'CHEFE FIT', preco: 26.90, detalhes: 'Mix de folhas, tomate cereja, brócolis grelhado ao alho, parmesão. Proteína: tiras de frango ou carne.' },
+            { id: 'arcoiris', nome: 'ARCO-ÍRIS', preco: 23.90, detalhes: 'Alface crespa, tomate, repolho, beterraba ralada, cenoura ralada, milho. Proteína: ovos de codorna.' },
+        ],
+        adicionais: [
+            { nome: 'Arroz integral', preco: 4.00 },
+            { nome: 'Ovo cozido', preco: 3.00 },
+            { nome: 'Tiras de carne', preco: 5.00 },
+            { nome: 'Tiras de frango', preco: 5.00 },
+            { nome: 'Camarão', preco: 12.00 },
+        ],
+        
+        // Dados de Contato (Existentes)
         whatsappNumber: "5517997381858",
         pixData: { 
             name: "SUÉLEM CRISTINA MAESTRE MAZZUCCA",
@@ -195,30 +268,48 @@ fieldset:disabled {
 
     // --- ESTADO GLOBAL ---
     let cart = []; 
+    // Variáveis Kebab (Existentes)
     let currentItemPrice = MENU.tamanhos[0].preco;
     let premiumPrice = 0; 
     let selectedAcompanhamentos = 0;
     let maxAcompanhamentos = MENU.tamanhos[0].limite;
     let selectedMolhos = 0;
     let maxMolhos = MENU.maxMolhos;
+    
+    // Variáveis Salada (NOVAS)
+    let selectedSalad = null;
+    let currentSaladPrice = 0;
 
     // --- REFERÊNCIAS DOM ---
+    // Referências Kebab (Existentes)
     const sizeOptionsDiv = document.getElementById('size-options');
     const molhoOptionsDiv = document.getElementById('molho-options');
     const acompOptionsDiv = document.getElementById('acomp-options');
     const acompCounter = document.getElementById('acomp-counter');
     const itemPriceDisplay = document.getElementById('item-price-display');
+    const proteinOptionsDiv = document.getElementById('protein-options');
+    const addToCartBtn = document.getElementById('add-to-cart-btn');
+    
+    // Referências Salada (NOVAS)
+    const saladOptionsDiv = document.getElementById('salad-options');
+    const saladDetailsDiv = document.getElementById('salad-details');
+    const selectedSaladName = document.getElementById('selected-salad-name');
+    const adicionalOptionsDiv = document.getElementById('adicional-options');
+    const saladMolhoOptionsDiv = document.getElementById('salad-molho-options');
+    const saladPriceDisplay = document.getElementById('salad-price-display');
+    const addSaladToCartBtn = document.getElementById('add-salad-to-cart-btn');
+
+    // Referências Gerais (Existentes)
     const cartList = document.getElementById('cart-list');
     const checkoutSection = document.getElementById('checkout-section');
     const deliveryFeeRadios = document.querySelectorAll('input[name="deliveryFee"]');
-    const addToCartBtn = document.getElementById('add-to-cart-btn');
     const checkoutBtn = document.getElementById('checkout-btn');
     const trocoInputContainer = document.getElementById('troco-input-container'); 
     const paymentMethodSelect = document.getElementById('payment-method');
-    const proteinOptionsDiv = document.getElementById('protein-options');
 
     // --- FUNÇÕES DE LÓGICA E RENDERIZAÇÃO INICIAL ---
 
+    // Função auxiliar para renderizar opções (Radio ou Checkbox)
     function renderOptions(container, name, options, type = 'radio', checkedValue = null, isSizeOption = false) {
         container.innerHTML = options.map((option, index) => {
             const value = isSizeOption ? option.id : option;
@@ -230,10 +321,13 @@ fieldset:disabled {
                 labelText += `, Máx. ${option.limite} Acomp.`;
             }
 
-            const isChecked = checkedValue ? (value === checkedValue) : (index === 0 && !isSizeOption);
+            const isChecked = checkedValue ? (value === checkedValue) : (index === 0 && !isSizeOption && type === 'radio');
             
+            // Layout mais simples para Molhos e Acompanhamentos
+            const labelClasses = type === 'checkbox' && name !== 'adicional' ? 'flex items-center p-3 bg-white rounded-lg shadow-md hover:bg-[#f7fcf6] transition duration-150 flex-1 cursor-pointer acomp-option' : 'flex items-center p-3 bg-white rounded-lg shadow-md hover:bg-[#f7fcf6] transition duration-150 flex-1 cursor-pointer';
+
             return `
-                <label class="flex items-center p-3 bg-white rounded-lg shadow-md hover:bg-[#f7fcf6] transition duration-150 flex-1 cursor-pointer acomp-option">
+                <label class="${labelClasses}">
                     <input type="${type}" name="${name}" value="${value}" 
                         class="${type === 'radio' ? 'form-radio text-green-600' : 'form-checkbox text-green-600'}"
                         ${isChecked ? 'checked' : ''}>
@@ -243,30 +337,166 @@ fieldset:disabled {
         }).join('');
     }
     
-    function renderMolhos() {
-        renderOptions(molhoOptionsDiv, 'molho', MENU.molhos, 'checkbox');
-        molhoOptionsDiv.addEventListener('change', updateMolhoCount);
+    // NOVO: Renderiza as opções de Salada (AGORA COM MARCADOR CUSTOMIZADO)
+    function renderSaladOptions() {
+        saladOptionsDiv.innerHTML = MENU.saladas.map(salad => `
+            <div class="menu-item-card" data-salad-id="${salad.id}" onclick="selectSalad('${salad.id}')">
+                <div class="custom-radio-marker"></div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-start">
+                        <h3 class="font-bold text-gray-800">${salad.nome}</h3>
+                        <span class="font-extrabold text-lg text-green-700">R$ ${salad.preco.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-1">${salad.detalhes}</p>
+                </div>
+            </div>
+        `).join('');
     }
 
-    function renderAcompanhamentos() {
-        MENU.acompanhamentos.sort((a, b) => a.localeCompare(b));
-        renderOptions(acompOptionsDiv, 'acomp', MENU.acompanhamentos, 'checkbox');
+    // NOVO: Renderiza as opções de Adicionais
+    function renderAdicionalOptions() {
+        const adicionalHtml = MENU.adicionais.map(adicional => `
+            <label class="flex items-center p-2 bg-white rounded-lg shadow-sm hover:bg-gray-50 transition duration-150 cursor-pointer">
+                <input type="checkbox" name="adicional" value="${adicional.nome}" data-price="${adicional.preco}" class="form-checkbox text-blue-600">
+                <span class="ml-2 text-sm font-medium">${adicional.nome} (+ R$ ${adicional.preco.toFixed(2).replace('.', ',')})</span>
+            </label>
+        `).join('');
+        adicionalOptionsDiv.innerHTML = adicionalHtml;
+        adicionalOptionsDiv.querySelectorAll('input[name="adicional"]').forEach(cb => cb.addEventListener('change', updateSaladPrice));
     }
     
+    // NOVO: Renderiza os molhos para a Salada (reutiliza a lista do Kebab)
+    function renderSaladMolhos() {
+        // Usamos radio buttons para simplificar, pois a descrição dos pratos diz (acomp. molho)
+        renderOptions(saladMolhoOptionsDiv, 'salad_molho', MENU.molhos, 'radio');
+        
+        // Remove o "checked" default do renderOptions, para forçar a seleção
+        const defaultChecked = saladMolhoOptionsDiv.querySelector('input[name="salad_molho"]:checked');
+        if (defaultChecked) defaultChecked.checked = false;
+    }
+
+    // Função de Inicialização (atualizada)
     function setupUI() {
+        // Kebab Setup
         renderOptions(sizeOptionsDiv, 'size', MENU.tamanhos, 'radio', 'P', true);
         renderOptions(proteinOptionsDiv, 'proteina', MENU.proteinas, 'radio');
-        renderMolhos(); 
-        renderAcompanhamentos();
+        renderOptions(molhoOptionsDiv, 'molho', MENU.molhos, 'checkbox'); // Molhos para Kebab
+        renderOptions(acompOptionsDiv, 'acomp', MENU.acompanhamentos, 'checkbox');
 
         sizeOptionsDiv.addEventListener('change', updateLimitAndPrice);
+        molhoOptionsDiv.addEventListener('change', updateMolhoCount); // Limite de 2 Molhos para Kebab
         acompOptionsDiv.addEventListener('change', updateAcompCount);
+
+        // Salada Setup (NOVAS CHAMADAS)
+        renderSaladOptions();
+        renderAdicionalOptions();
+        renderSaladMolhos();
+
+        // Listeners para Salada
+        saladOptionsDiv.addEventListener('click', updateSaladPrice); // Chamada em 'selectSalad'
+        
         deliveryFeeRadios.forEach(radio => radio.addEventListener('change', updateFinalSummary));
 
         updateLimitAndPrice();
         renderCart(); 
+        toggleTrocoField(); // Inicializa a visibilidade do troco
     }
     
+    // NOVO: Lógica de Seleção de Salada
+    function selectSalad(saladId) {
+        const newSalad = MENU.saladas.find(s => s.id === saladId);
+
+        // Remove a seleção anterior
+        document.querySelectorAll('.menu-item-card').forEach(card => card.classList.remove('selected'));
+        
+        // Adiciona a seleção ao card clicado
+        const selectedCard = document.querySelector(`[data-salad-id="${saladId}"]`);
+        if (selectedCard) {
+            selectedCard.classList.add('selected');
+        }
+
+        selectedSalad = newSalad;
+        
+        // Atualiza a interface
+        selectedSaladName.textContent = newSalad.nome;
+        saladDetailsDiv.style.display = 'block';
+        
+        // Reinicia os adicionais e molho
+        document.querySelectorAll('input[name="adicional"]').forEach(cb => cb.checked = false);
+        document.querySelectorAll('input[name="salad_molho"]').forEach(rb => rb.checked = false);
+        document.getElementById('salad-obs').value = '';
+        
+        updateSaladPrice();
+    }
+    
+    // NOVO: Lógica de Cálculo de Preço da Salada
+    function updateSaladPrice() {
+        if (!selectedSalad) {
+            currentSaladPrice = 0;
+            return;
+        }
+
+        let basePrice = selectedSalad.preco;
+        let adicionalPrice = 0;
+
+        document.querySelectorAll('input[name="adicional"]:checked').forEach(cb => {
+            adicionalPrice += parseFloat(cb.dataset.price);
+        });
+
+        currentSaladPrice = basePrice + adicionalPrice;
+        saladPriceDisplay.textContent = `R$ ${currentSaladPrice.toFixed(2).replace('.', ',')}`;
+    }
+
+    // NOVO: Lógica para adicionar Salada ao Carrinho
+    function addSaladToCart() {
+        addSaladToCartBtn.disabled = true; 
+        addSaladToCartBtn.textContent = 'Adicionando...';
+        
+        if (!selectedSalad) {
+            showModal('Por favor, selecione uma salada para adicionar ao carrinho.', 'bg-red-500');
+            addSaladToCartBtn.disabled = false;
+            addSaladToCartBtn.textContent = 'ADICIONAR SALADA AO CARRINHO';
+            return;
+        }
+
+        const selectedMolho = document.querySelector('input[name="salad_molho"]:checked');
+        if (!selectedMolho) {
+             showModal('Por favor, selecione um molho para sua salada.', 'bg-red-500');
+             addSaladToCartBtn.disabled = false;
+             addSaladToCartBtn.textContent = 'ADICIONAR SALADA AO CARRINHO';
+             return;
+        }
+
+        const adicionais = Array.from(document.querySelectorAll('input[name="adicional"]:checked'))
+                                .map(cb => `${cb.value} (+R$ ${parseFloat(cb.dataset.price).toFixed(2).replace('.', ',')})`);
+
+        const saladItem = {
+            type: 'salad',
+            nome: selectedSalad.nome,
+            price: currentSaladPrice,
+            molho: selectedMolho.value,
+            adicionais: adicionais,
+            obs: document.getElementById('salad-obs').value.trim()
+        };
+
+        cart.push(saladItem);
+        showModal(`Salada ${selectedSalad.nome} adicionada ao carrinho!`, 'bg-blue-500');
+        renderCart();
+        
+        // Reset da Salada
+        selectedSalad = null;
+        saladDetailsDiv.style.display = 'none';
+        document.querySelectorAll('.menu-item-card').forEach(card => card.classList.remove('selected'));
+        
+        document.getElementById('checkout-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        setTimeout(() => {
+            addSaladToCartBtn.disabled = false;
+            addSaladToCartBtn.textContent = 'ADICIONAR SALADA AO CARRINHO';
+        }, 300); 
+    }
+
+    // Funções Kebab (Mantidas)
     function toggleTrocoField() {
         const isMoney = paymentMethodSelect.value === 'Dinheiro';
         trocoInputContainer.style.display = isMoney ? 'block' : 'none';
@@ -349,6 +579,7 @@ fieldset:disabled {
         }
 
         const customItem = {
+            type: 'kebab', // Adicionando tipo para diferenciar no carrinho
             size: sizeRadio.value,
             price: currentItemPrice,
             proteina: proteinaRadio.value, 
@@ -392,7 +623,7 @@ fieldset:disabled {
         updateLimitAndPrice(); 
     }
 
-    // --- FUNÇÕES DE CARRINHO E TOTALIZAÇÃO ---
+    // --- FUNÇÕES DE CARRINHO E TOTALIZAÇÃO (Atualizadas) ---
 
     function renderCart() {
         cartList.innerHTML = '';
@@ -406,18 +637,34 @@ fieldset:disabled {
                 const li = document.createElement('li');
                 li.className = 'p-3 border border-gray-100 bg-white rounded-lg shadow-sm space-y-1';
                 
-                const molhoList = item.molhos.join(', ');
-                const acompList = item.acompanhamentos.length > 0 ? item.acompanhamentos.join(', ') : 'Nenhum';
+                let itemDetails;
+
+                if (item.type === 'kebab') {
+                    const molhoList = item.molhos.join(', ');
+                    const acompList = item.acompanhamentos.length > 0 ? item.acompanhamentos.join(', ') : 'Nenhum';
+                    
+                    itemDetails = `
+                        <h3 class="font-bold text-gray-800">#${index + 1} - Kebab ${item.size} (${item.proteina})</h3>
+                        <p class="text-sm text-gray-600">Molhos Selecionados: ${molhoList}</p>
+                        <p class="text-sm text-gray-600">Acompanhamentos: ${acompList}</p>
+                    `;
+                } else if (item.type === 'salad') {
+                    const adicionaisList = item.adicionais.length > 0 ? item.adicionais.join(' | ') : 'Nenhum Adicional';
+                    
+                    itemDetails = `
+                        <h3 class="font-bold text-gray-800">#${index + 1} - Salada ${item.nome}</h3>
+                        <p class="text-sm text-gray-600">Molho Selecionado: ${item.molho}</p>
+                        <p class="text-sm text-gray-600">Adicionais: ${adicionaisList}</p>
+                    `;
+                }
                 
                 li.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <h3 class="font-bold text-gray-800">#${index + 1} - Kebab ${item.size} (${item.proteina})</h3>
+                    <div class="flex justify-between items-start">
+                        ${itemDetails}
                         <button onclick="removeItem(${index})" class="text-red-500 hover:text-red-700 text-sm font-semibold transition duration-150">
                             Remover
                         </button>
                     </div>
-                    <p class="text-sm text-gray-600">Molhos Selecionados: ${molhoList}</p>
-                    <p class="text-sm text-gray-600">Acompanhamentos: ${acompList}</p>
                     <p class="text-sm text-gray-600 italic">Obs: ${item.obs || 'Nenhuma'}</p>
                     <p class="text-lg font-extrabold text-green-700 text-right">R$ ${item.price.toFixed(2).replace('.', ',')}</p>
                 `;
@@ -440,7 +687,7 @@ fieldset:disabled {
     function removeItem(index) {
         cart.splice(index, 1); 
         renderCart();
-        showModal('Kebab removido do carrinho.', 'bg-yellow-600');
+        showModal('Item removido do carrinho.', 'bg-yellow-600');
     }
 
     function getDeliveryFee() {
@@ -459,6 +706,7 @@ fieldset:disabled {
         document.getElementById('final-total').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
     }
 
+    // Função de Geração de Link (Atualizada para incluir Saladas)
     function generateWhatsAppLink() {
         const nome = document.getElementById('nome').value.trim();
         const telefone = document.getElementById('telefone').value.trim();
@@ -484,19 +732,26 @@ fieldset:disabled {
         const troco = document.getElementById('troco').value.trim();
         const referencia = document.getElementById('referencia').value.trim();
 
-        let message = `*PEDIDO MOVITA - MONTE SEU KEBAB*\n\n`;
+        let message = `*PEDIDO MOVITA - KEBAB & SALADAS*\n\n`;
         message += `====================================\n`;
 
         // ITENS MONTADOS (DESTACADO EM NEGRITO)
-        message += `*🥙 ITENS MONTADOS (${cart.length}x):*\n`;
+        message += `*🍲 ITENS DO PEDIDO (${cart.length}x):*\n`;
         cart.forEach((item, index) => {
-            const molhoList = item.molhos.join(', ');
-            const acompList = item.acompanhamentos.join(', ');
+            message += `\n*#${index + 1} - ${item.type === 'kebab' ? 'Kebab' : 'Salada'} ${item.type === 'kebab' ? item.size : item.nome} (R$ ${item.price.toFixed(2).replace('.', ',')})*\n`;
 
-            // TODO o bloco do item em negrito
-            message += `\n*#${index + 1} - Kebab ${item.size} (${item.proteina}) (R$ ${item.price.toFixed(2).replace('.', ',')})*\n`;
-            message += `*-> Molhos: ${molhoList}*\n`;
-            message += `*-> Acompanhamentos: ${acompList}*\n`;
+            if (item.type === 'kebab') {
+                const molhoList = item.molhos.join(', ');
+                const acompList = item.acompanhamentos.join(', ');
+                message += `*-> Proteína: ${item.proteina}*\n`;
+                message += `*-> Molhos: ${molhoList}*\n`;
+                message += `*-> Acompanhamentos: ${acompList}*\n`;
+            } else if (item.type === 'salad') {
+                const adicionaisList = item.adicionais.length > 0 ? item.adicionais.join(' | ') : 'Nenhum';
+                message += `*-> Molho: ${item.molho}*\n`;
+                message += `*-> Adicionais: ${adicionaisList}*\n`;
+            }
+
             if (item.obs) {
                 message += `*-> Obs: ${item.obs}*\n`;
             }
@@ -558,6 +813,8 @@ fieldset:disabled {
     window.onload = setupUI;
     // Exporta funções para uso global (inline onclick, onchange)
     window.addToCart = addToCart;
+    window.addSaladToCart = addSaladToCart; 
+    window.selectSalad = selectSalad; 
     window.removeItem = removeItem;
     window.generateWhatsAppLink = generateWhatsAppLink;
     window.toggleTrocoField = toggleTrocoField;
