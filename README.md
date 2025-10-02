@@ -60,7 +60,10 @@ fieldset:disabled {
     @apply form-radio text-green-600 mr-2 mt-1 flex-shrink-0;
 }
 
-/* REMOVIDO: .custom-radio-marker e seu estilo (Para unificar visual) */
+/* NOVO ESTILO: Salada selecionada que fica visível enquanto as outras somem */
+.selected-salad-summary {
+    @apply p-4 border-2 border-green-600 bg-green-50 rounded-lg shadow-lg mb-4;
+}
 
 </style>
 </head>
@@ -122,12 +125,22 @@ fieldset:disabled {
         <section id="salad-order-section" class="space-y-6 p-4 border border-[#e1eef0] rounded-xl bg-[#f6fcf7]">
             <h2 class="section-title text-[#4a5540]">🥗 Escolha Sua Salada</h2>
 
+            <div id="salad-summary-selection" class="space-y-4" style="display: none;">
+                <div class="selected-salad-summary">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-xl text-green-800">Salada Selecionada: <span id="selected-salad-name-summary"></span></h3>
+                        <button onclick="resetSaladSelection()" class="text-sm text-blue-700 hover:text-blue-900 font-semibold underline">
+                            Trocar Salada
+                        </button>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">Molho: <span class="font-bold">Molho Especial da Casa</span></p> 
+                    <p class="text-xs text-gray-500 mt-1">Detalhes: <span id="selected-salad-details-summary"></span></p>
+                </div>
+            </div>
             <div id="salad-options" class="space-y-3">
                 </div>
 
             <div id="salad-details" style="display: none;" class="space-y-4 p-3 border rounded-lg bg-gray-50">
-                 <h3 class="font-bold text-lg text-[#4a5540]">Personalize a <span id="selected-salad-name"></span>:</h3>
-                 <p class="text-md font-semibold text-gray-700">Acompanha: <span id="selected-salad-molho" class="text-blue-600 font-bold">Molho Especial</span></p>
                  
                  <div class="space-y-2">
                     <label class="block font-semibold text-gray-700">➕ Adicionais (Opcional)</label>
@@ -238,7 +251,7 @@ fieldset:disabled {
             { id: 'G', nome: 'Grande', preco: 25.90, limite: 4 }
         ],
         
-        // Dados das SALADAS (ATUALIZADO: Molho sem descrição no nome)
+        // Dados das SALADAS (Molho sem descrição no nome)
         saladas: [
             { id: 'origem', nome: 'ORIGEM', preco: 26.90, molho: 'Azeite & Balsâmico', detalhes: 'Macarrão penne, alface americano, tomate cereja, cebola roxa, milho, cenoura ralada, salsinha. Proteína: tiras de frango ou atum.' },
             { id: 'crockfit', nome: 'CROCK FIT', preco: 26.90, molho: 'Molho Caesar', detalhes: 'Alface americano, pepino, tomate cereja, parmesão ralado, croutons. Proteína: tiras de frango.' },
@@ -289,9 +302,11 @@ fieldset:disabled {
     
     // Referências Salada (NOVAS)
     const saladOptionsDiv = document.getElementById('salad-options');
+    const saladSummarySelection = document.getElementById('salad-summary-selection'); // Novo!
+    const selectedSaladNameSummary = document.getElementById('selected-salad-name-summary'); // Novo!
+    // const selectedSaladMolhoSummary = document.getElementById('selected-salad-molho-summary'); // Removido do JS, pois o texto é fixo
+    const selectedSaladDetailsSummary = document.getElementById('selected-salad-details-summary'); // Novo!
     const saladDetailsDiv = document.getElementById('salad-details');
-    const selectedSaladName = document.getElementById('selected-salad-name');
-    const selectedSaladMolho = document.getElementById('selected-salad-molho'); 
     const adicionalOptionsDiv = document.getElementById('adicional-options');
     const saladPriceDisplay = document.getElementById('salad-price-display');
     const addSaladToCartBtn = document.getElementById('add-salad-to-cart-btn');
@@ -341,13 +356,13 @@ fieldset:disabled {
         });
     }
     
-    // Renderiza as opções de Salada (AGORA UNIFICADA com estilo Kebab/Radio Nativo)
+    // Renderiza as opções de Salada (AGORA COM NOME DO MOLHO GENÉRICO)
     function renderSaladOptions() {
         saladOptionsDiv.innerHTML = MENU.saladas.map(salad => `
             <label class="menu-item-card salad-option-card" data-salad-id="${salad.id}" data-price="${salad.preco}">
                 <input type="radio" name="salad" value="${salad.id}" 
                        class="salad-input"
-                       onclick="selectSalad('${salad.id}'); this.closest('.salad-option-card').classList.add('selected');">
+                       onclick="selectSalad('${salad.id}');">
                 
                 <div class="flex-1 ml-2">
                     <div class="flex justify-between items-start">
@@ -355,7 +370,7 @@ fieldset:disabled {
                         <span class="font-extrabold text-lg text-green-700">R$ ${salad.preco.toFixed(2).replace('.', ',')}</span>
                     </div>
                     <p class="text-sm text-gray-500 mt-1">${salad.detalhes}</p>
-                    <p class="text-xs font-semibold text-blue-500 mt-1">Acompanha Molho: ${salad.molho}</p>
+                    <p class="text-xs font-semibold text-blue-500 mt-1">Acompanha Molho: Molho Especial da Casa</p>
                 </div>
             </label>
         `).join('');
@@ -400,6 +415,11 @@ fieldset:disabled {
         // Salada Setup
         renderSaladOptions();
         renderAdicionalOptions(); 
+        
+        // As opções de salada devem estar visíveis no início
+        saladOptionsDiv.style.display = 'block';
+        saladDetailsDiv.style.display = 'none';
+        saladSummarySelection.style.display = 'none';
 
         deliveryFeeRadios.forEach(radio => radio.addEventListener('change', updateFinalSummary));
 
@@ -408,14 +428,17 @@ fieldset:disabled {
         toggleTrocoField(); 
     }
     
-    // Lógica de Seleção de Salada (ATUALIZADA para lidar com radio buttons)
+    // Lógica de Seleção de Salada (ATUALIZADA para esconder as outras)
     function selectSalad(saladId) {
         const newSalad = MENU.saladas.find(s => s.id === saladId);
 
-        // Remove a seleção anterior de TODOS os cartões de Salada Principal
+        // 1. Esconde a lista completa de saladas
+        saladOptionsDiv.style.display = 'none';
+
+        // 2. Remove a seleção anterior de TODOS os cartões de Salada Principal
         document.querySelectorAll('.salad-option-card').forEach(card => card.classList.remove('selected'));
         
-        // Adiciona a seleção ao card clicado
+        // 3. Adiciona a seleção ao card clicado (para manter o anel verde na opção escolhida, que agora está "escondida")
         const selectedCard = document.querySelector(`[data-salad-id="${saladId}"]`);
         if (selectedCard) {
             selectedCard.classList.add('selected');
@@ -423,9 +446,13 @@ fieldset:disabled {
 
         selectedSalad = newSalad;
         
-        // Atualiza a interface
-        selectedSaladName.textContent = newSalad.nome;
-        selectedSaladMolho.textContent = newSalad.molho; 
+        // 4. Atualiza e mostra o novo container de resumo
+        selectedSaladNameSummary.textContent = newSalad.nome;
+        // selectedSaladMolhoSummary.textContent = newSalad.molho; // Removido do JS, pois o texto é fixo no HTML
+        selectedSaladDetailsSummary.textContent = newSalad.detalhes;
+        saladSummarySelection.style.display = 'block';
+        
+        // 5. Mostra a seção de detalhes/adicionais (que agora está mais próxima)
         saladDetailsDiv.style.display = 'block';
         
         // Reinicia os adicionais (limpando o visual e o estado)
@@ -435,6 +462,29 @@ fieldset:disabled {
         document.getElementById('salad-obs').value = '';
         
         updateSaladPrice();
+    }
+    
+    // NOVO: Função para Resetar a Seleção de Salada
+    function resetSaladSelection() {
+        // 1. Esconde a seção de resumo e detalhes
+        saladSummarySelection.style.display = 'none';
+        saladDetailsDiv.style.display = 'none';
+        
+        // 2. Mostra a lista completa de saladas
+        saladOptionsDiv.style.display = 'block';
+
+        // 3. Limpa o estado e a seleção visual
+        selectedSalad = null;
+        document.querySelectorAll('.salad-option-card').forEach(card => card.classList.remove('selected'));
+        document.querySelectorAll('input[name="salad"]').forEach(radio => radio.checked = false);
+        document.getElementById('salad-obs').value = '';
+        
+        // Re-renderiza os adicionais para limpar as opções
+        renderAdicionalOptions();
+        updateSaladPrice();
+        
+        // Rola a tela de volta para o topo da seção de saladas
+        document.getElementById('salad-order-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     
     // Lógica de Cálculo de Preço da Salada (Mantida)
@@ -456,7 +506,7 @@ fieldset:disabled {
         saladPriceDisplay.textContent = `R$ ${currentSaladPrice.toFixed(2).replace('.', ',')}`;
     }
 
-    // Lógica para adicionar Salada ao Carrinho (Mantida)
+    // Lógica para adicionar Salada ao Carrinho (ATUALIZADA com reset)
     function addSaladToCart() {
         addSaladToCartBtn.disabled = true; 
         addSaladToCartBtn.textContent = 'Adicionando...';
@@ -468,7 +518,7 @@ fieldset:disabled {
             return;
         }
 
-        const saladMolho = selectedSalad.molho; 
+        const saladMolho = selectedSalad.molho; // Mantém o molho real no objeto do carrinho
 
         const adicionais = Array.from(document.querySelectorAll('input[name="adicional"]:checked'))
                                 .map(cb => `${cb.value} (+R$ ${parseFloat(cb.dataset.price).toFixed(2).replace('.', ',')})`);
@@ -477,7 +527,7 @@ fieldset:disabled {
             type: 'salad',
             nome: selectedSalad.nome,
             price: currentSaladPrice,
-            molho: saladMolho, 
+            molho: saladMolho, // O molho real é armazenado aqui para ir no WhatsApp
             adicionais: adicionais,
             obs: document.getElementById('salad-obs').value.trim()
         };
@@ -486,14 +536,8 @@ fieldset:disabled {
         showModal(`Salada ${selectedSalad.nome} adicionada ao carrinho!`, 'bg-blue-500');
         renderCart();
         
-        // Reset da Salada
-        selectedSalad = null;
-        saladDetailsDiv.style.display = 'none';
-        document.querySelectorAll('.salad-option-card').forEach(card => card.classList.remove('selected'));
-        document.querySelectorAll('input[name="salad"]').forEach(radio => radio.checked = false);
-        
-        // Re-renderiza os adicionais para limpar as opções (e o estado visual de 'selected')
-        renderAdicionalOptions();
+        // Reset da Salada (USANDO A NOVA FUNÇÃO DE RESET)
+        resetSaladSelection();
         
         document.getElementById('checkout-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
@@ -674,7 +718,7 @@ fieldset:disabled {
                     
                     itemDetails = `
                         <h3 class="font-bold text-gray-800">#${index + 1} - Salada ${item.nome}</h3>
-                        <p class="text-sm text-gray-600">Molho Especial: ${item.molho}</p>
+                        <p class="text-sm text-gray-600">Molho Especial: ${item.molho}</p> 
                         <p class="text-sm text-gray-600">Adicionais: ${adicionaisList}</p>
                     `;
                 }
@@ -769,8 +813,8 @@ fieldset:disabled {
                 message += `*-> Acompanhamentos: ${acompList}*\n`;
             } else if (item.type === 'salad') {
                 const adicionaisList = item.adicionais.length > 0 ? item.adicionais.join(' | ') : 'Nenhum';
-                // Molho Especial SEM descrição detalhada
-                message += `*-> Molho Especial: ${item.molho}*\n`;
+                // Molho Especial AGORA MOSTRA O NOME REAL do molho para a cozinha
+                message += `*-> Molho Especial: ${item.molho}*\n`; 
                 message += `*-> Adicionais: ${adicionaisList}*\n`;
             }
 
@@ -837,6 +881,7 @@ fieldset:disabled {
     window.addToCart = addToCart;
     window.addSaladToCart = addSaladToCart; 
     window.selectSalad = selectSalad; 
+    window.resetSaladSelection = resetSaladSelection; // Exporta a nova função
     window.removeItem = removeItem;
     window.generateWhatsAppLink = generateWhatsAppLink;
     window.toggleTrocoField = toggleTrocoField;
