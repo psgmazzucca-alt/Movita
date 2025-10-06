@@ -48,7 +48,7 @@ fieldset:disabled {
 </head>
 <body class="min-h-screen p-4 flex justify-center">
 
-<div id="app" class="w-full max-w-xl bg-white shadow-2xl rounded-xl space-y-6">
+<div id="app" class="w-full max-w-xl bg-white shadow-2xl rounded-xl space-y-6 md:p-0">
     <header class="text-center relative movita-bg rounded-t-xl py-6 shadow-2xl">
         <img src="https://i.postimg.cc/ht6ZFPyk/Black-White-Minimal-Modern-Simple-Bold-Business-Mag-Logo-1.png" 
              alt="Logo Movita" 
@@ -254,13 +254,11 @@ fieldset:disabled {
     }
     
     function setupUI() {
-        // Inicializa as opções de tamanho, proteína, molhos e acompanhamentos
         renderOptions(sizeOptionsDiv, 'size', MENU.tamanhos, 'radio', 'P', true);
         renderOptions(proteinOptionsDiv, 'proteina', MENU.proteinas, 'radio');
         renderMolhos(); 
         renderAcompanhamentos();
 
-        // Adiciona listeners para interações que mudam o preço/limites
         sizeOptionsDiv.addEventListener('change', updateLimitAndPrice);
         acompOptionsDiv.addEventListener('change', updateAcompCount);
         deliveryFeeRadios.forEach(radio => radio.addEventListener('change', updateFinalSummary));
@@ -383,18 +381,13 @@ fieldset:disabled {
     }
     
     function resetForm() {
-        // Desmarca a proteína selecionada
         document.querySelectorAll('input[name="proteina"]').forEach(r => r.checked = false); 
-        // Desmarca todos os molhos
         document.querySelectorAll('input[name="molho"]').forEach(cb => cb.checked = false); 
-        // Desmarca todos os acompanhamentos
         document.querySelectorAll('input[name="acomp"]').forEach(cb => cb.checked = false);
-        // Limpa a observação
         document.getElementById('obs').value = '';
 
         updateMolhoCount(); 
         
-        // Retorna ao tamanho P
         document.querySelector('input[name="size"][value="P"]').checked = true;
         updateLimitAndPrice(); 
     }
