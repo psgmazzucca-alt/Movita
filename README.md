@@ -49,7 +49,7 @@ fieldset:disabled {
 </head>
 <body class="min-h-screen p-4 flex justify-center">
 
-<div id="app" class="w-full max-w-xl bg-white shadow-2xl rounded-xl space-y-6 md:p-0">
+<div id="app" class="w-full max-w-xl bg-white shadow-2xl rounded-xl space-y-6">
     <header class="text-center relative movita-bg rounded-t-xl py-6 shadow-2xl">
         <img src="https://i.postimg.cc/ht6ZFPyk/Black-White-Minimal-Modern-Simple-Bold-Business-Mag-Logo-1.png" 
              alt="Logo Movita" 
@@ -102,8 +102,6 @@ fieldset:disabled {
                 ADICIONAR PRATO AO CARRINHO E MONTAR OUTRO
             </button>
         </section>
-        
-        ---
 
         <section class="space-y-4 p-4 border border-gray-200 rounded-xl bg-gray-50">
             <h2 class="section-title text-gray-700 border-gray-200">🛒 Seu Pedido (<span id="cart-count">0</span> Pratos)</h2>
@@ -114,8 +112,6 @@ fieldset:disabled {
                 SUBTOTAL: <span id="subtotal-display">R$ 0,00</span>
             </p>
         </section>
-
-        ---
 
         <section id="checkout-section" class="space-y-6" style="display: none;">
             <h2 class="section-title">Dados de Entrega e Pagamento</h2>
