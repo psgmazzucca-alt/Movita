@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -101,6 +102,8 @@ fieldset:disabled {
                 ADICIONAR PRATO AO CARRINHO E MONTAR OUTRO
             </button>
         </section>
+        
+        ---
 
         <section class="space-y-4 p-4 border border-gray-200 rounded-xl bg-gray-50">
             <h2 class="section-title text-gray-700 border-gray-200">🛒 Seu Pedido (<span id="cart-count">0</span> Pratos)</h2>
@@ -111,6 +114,8 @@ fieldset:disabled {
                 SUBTOTAL: <span id="subtotal-display">R$ 0,00</span>
             </p>
         </section>
+
+        ---
 
         <section id="checkout-section" class="space-y-6" style="display: none;">
             <h2 class="section-title">Dados de Entrega e Pagamento</h2>
@@ -254,11 +259,13 @@ fieldset:disabled {
     }
     
     function setupUI() {
+        // Inicializa as opções de tamanho, proteína, molhos e acompanhamentos
         renderOptions(sizeOptionsDiv, 'size', MENU.tamanhos, 'radio', 'P', true);
         renderOptions(proteinOptionsDiv, 'proteina', MENU.proteinas, 'radio');
         renderMolhos(); 
         renderAcompanhamentos();
 
+        // Adiciona listeners para interações que mudam o preço/limites
         sizeOptionsDiv.addEventListener('change', updateLimitAndPrice);
         acompOptionsDiv.addEventListener('change', updateAcompCount);
         deliveryFeeRadios.forEach(radio => radio.addEventListener('change', updateFinalSummary));
@@ -381,13 +388,18 @@ fieldset:disabled {
     }
     
     function resetForm() {
+        // Desmarca a proteína selecionada
         document.querySelectorAll('input[name="proteina"]').forEach(r => r.checked = false); 
+        // Desmarca todos os molhos
         document.querySelectorAll('input[name="molho"]').forEach(cb => cb.checked = false); 
+        // Desmarca todos os acompanhamentos
         document.querySelectorAll('input[name="acomp"]').forEach(cb => cb.checked = false);
+        // Limpa a observação
         document.getElementById('obs').value = '';
 
         updateMolhoCount(); 
         
+        // Retorna ao tamanho P
         document.querySelector('input[name="size"][value="P"]').checked = true;
         updateLimitAndPrice(); 
     }
@@ -564,4 +576,3 @@ fieldset:disabled {
 </script>
 </body>
 </html>
-
