@@ -207,7 +207,7 @@ fieldset:disabled {
     const MENU = {
         // --- KEBAB ---
         proteinas: ["Frango", "Carne", "Atum"], 
-        molhos: ["Barbecue", "Maionese Verde", "Mostarda Amarela", "Ketchup", "Maionese de Alho", "Cream Ceese", "Molho Rosé"],
+        molhos: ["Barbecue", "Maionese Verde", "Mostarda Amarela", "Ketchup", "Maionese de Alho", "Cream Cheese", "Molho Rosé"],
         maxMolhos: 2, 
         acompanhamentos: [
             "Alface", "Tomate", "Pepino", "Rúcula", "Cebola Roxa", 
