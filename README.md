@@ -68,18 +68,18 @@ fieldset:disabled {
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="space-y-2">
-                    <label class="block font-semibold text-gray-700">🥩 2. Escolha 1 Proteína (Obrigatório)</label>
+                    <label class="block font-semibold text-gray-700">🥩 2. Escolha 1 Proteína </label>
                     <div id="protein-options" class="space-y-1"></div>
                 </div>
 
                 <div class="space-y-2">
-                    <label class="block font-semibold text-gray-700">🧂 3. Escolha até 2 Molhos (Obrigatório)</label>
+                    <label class="block font-semibold text-gray-700">🧂 3. Escolha até 2 Molhos </label>
                     <div id="molho-options" class="space-y-1"></div>
                 </div>
             </div>
 
             <div class="space-y-2">
-                <label class="block font-semibold text-gray-700">🥗 4. Escolha até 4 Acompanhamentos (Obrigatório)</label>
+                <label class="block font-semibold text-gray-700">🥗 4. Escolha até 4 Acompanhamentos </label>
                 <p id="acomp-counter" class="text-sm font-medium text-[#4a5540]">Selecionados: 0/4</p>
                 <div id="acomp-options" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
             </div>
