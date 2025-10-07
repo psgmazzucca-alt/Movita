@@ -2,7 +2,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Movita - Monte Seu Kebab</title>
+<title>Movita - Cardápio Interativo</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -40,10 +40,6 @@ fieldset:disabled {
 .movita-bg {
     background-color: #aec6a2; /* Verde Oliva Claro */
 }
-/* Estilo para o input de quantidade de bebida (AGORA SEM USO) */
-.drink-input {
-    @apply w-16 p-2 text-center border border-gray-300 rounded-lg;
-}
 </style>
 </head>
 <body class="min-h-screen p-4 flex justify-center">
@@ -60,6 +56,41 @@ fieldset:disabled {
     </header>
 
     <div class="p-6 space-y-6 md:p-8 pt-0">
+        
+        <section id="salad-order-section" class="space-y-6 p-4 border border-[#e5f0e1] rounded-xl bg-[#f7fcf6]">
+            <h2 class="section-title text-[#4a5540]">🥗 Monte Sua Salada</h2>
+
+            <div class="space-y-2">
+                <label class="block font-semibold text-gray-700">1. Escolha a Salada Base *(Acompanha Molho)*</label>
+                <div id="salad-options" class="space-y-2">
+                    </div>
+            </div>
+            
+            <div id="salad-protein-choice-container" class="space-y-2 border-t pt-4 border-[#aec6a2]" style="display:none;">
+                <label class="block font-semibold text-gray-700">1.5. Escolha a Proteína Inclusa na Salada</label>
+                <div id="salad-protein-choice-options" class="grid grid-cols-2 gap-2">
+                    </div>
+            </div>
+
+            <div class="space-y-2 border-t pt-4 border-[#aec6a2]">
+                <label class="block font-semibold text-gray-700">2. Adicionais (Opcional)</label>
+                <div id="salad-adicionais-options" class="grid grid-cols-2 gap-2">
+                    </div>
+            </div>
+
+            <div class="space-y-2">
+                <label for="salad-obs" class="block font-semibold text-gray-700 border-t pt-4">3. Observações</label>
+                <input type="text" id="salad-obs" class="input-style" placeholder="Ex: Sem cebola roxa, molho a parte">
+                <p class="text-2xl font-extrabold text-red-700 mt-4 text-right">
+                    Preço da Salada: <span id="salad-price-display">R$ 0,00</span>
+                </p>
+            </div>
+            
+            <button id="add-salad-to-cart-btn" onclick="addSaladToCart()" 
+                class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-md transition duration-300 transform hover:scale-[1.01] active:scale-[0.98]">
+                ADICIONAR SALADA AO CARRINHO
+            </button>
+        </section>
         
         <section id="custom-order-section" class="space-y-6 p-4 border border-[#e5f0e1] rounded-xl bg-[#f7fcf6]">
             <h2 class="section-title text-[#4a5540]">🥙 Monte Seu Kebab</h2>
@@ -174,6 +205,7 @@ fieldset:disabled {
 <script>
     // --- DADOS DO CARDÁPIO (FONTE ÚNICA DE VERDADE) ---
     const MENU = {
+        // --- KEBAB ---
         proteinas: ["Frango", "Carne", "Atum"], 
         molhos: ["Barbecue", "Maionese Verde", "Mostarda Amarela", "Ketchup", "Maionese de Alho", "Cream Ceese", "Molho Rosé"],
         maxMolhos: 2, 
@@ -186,6 +218,24 @@ fieldset:disabled {
             { id: 'M', nome: 'Médio', preco: 21.90, limite: 4 },
             { id: 'G', nome: 'Grande', preco: 25.90, limite: 4 }
         ],
+
+        // --- 🆕 SALADAS ---
+        saladas: [
+            { nome: "ORIGEM", preco: 26.90, ingredientes: "Macarrão penne, alface americano, tomate cereja, cebola roxa, milho, cenoura ralada, salsinha.", proteinas: ["Tiras de Frango", "Atum"] },
+            { nome: "CROCK FIT", preco: 26.90, ingredientes: "Alface americano, pepino, tomate cereja, parmesão ralado, croutons.", proteinas: ["Tiras de Frango"] },
+            { nome: "TERRA E MAR", preco: 29.90, ingredientes: "Camarão, manga, alface crespa, rúcula, pepino, tomate cereja, milho.", proteinas: ["Camarão"], isExclusiva: true }, 
+            { nome: "TROPICÁLIA", preco: 22.90, ingredientes: "Alface crespa, rúcula, tomate cereja, cebola roxa, morango.", proteinas: ["Vegetariana"], isVeg: true }, 
+            { nome: "CHEFE FIT", preco: 26.90, ingredientes: "Mix de folhas, tomate cereja, brócolis grelhado ao alho, parmesão.", proteinas: ["Tiras de Frango", "Tiras de Carne"] },
+            { nome: "ARCO-ÍRIS", preco: 23.90, ingredientes: "Alface crespa, tomate, repolho, beterraba ralada, cenoura ralada, milho.", proteinas: ["Ovos de Codorna"] }
+        ],
+        adicionaisSalada: [
+            { nome: "Arroz Integral", preco: 4.00 },
+            { nome: "Ovo Cozido", preco: 3.00 },
+            { nome: "Tiras de Carne", preco: 5.00 },
+            { nome: "Tiras de Frango", preco: 5.00 },
+            { nome: "Camarão", preco: 12.00 }
+        ],
+
         whatsappNumber: "5517997381858",
         pixData: { 
             name: "SUÉLEM CRISTINA MAESTRE MAZZUCCA",
@@ -195,6 +245,8 @@ fieldset:disabled {
 
     // --- ESTADO GLOBAL ---
     let cart = []; 
+
+    // KEBAB STATE
     let currentItemPrice = MENU.tamanhos[0].preco;
     let premiumPrice = 0; 
     let selectedAcompanhamentos = 0;
@@ -202,22 +254,38 @@ fieldset:disabled {
     let selectedMolhos = 0;
     let maxMolhos = MENU.maxMolhos;
 
+    // 🆕 SALAD STATE
+    let currentSaladPrice = 0; 
+    let selectedSaladBase = null; 
+
     // --- REFERÊNCIAS DOM ---
+    // Kebab
     const sizeOptionsDiv = document.getElementById('size-options');
     const molhoOptionsDiv = document.getElementById('molho-options');
     const acompOptionsDiv = document.getElementById('acomp-options');
     const acompCounter = document.getElementById('acomp-counter');
     const itemPriceDisplay = document.getElementById('item-price-display');
+    const addToCartBtn = document.getElementById('add-to-cart-btn');
+    const proteinOptionsDiv = document.getElementById('protein-options');
+    
+    // 🆕 Salada
+    const saladOptionsDiv = document.getElementById('salad-options');
+    // const saladMolhoOptionsDiv = document.getElementById('salad-molho-options'); // Removido
+    const saladAdicionaisOptionsDiv = document.getElementById('salad-adicionais-options');
+    const saladPriceDisplay = document.getElementById('salad-price-display');
+    const addSaladToCartBtn = document.getElementById('add-salad-to-cart-btn');
+    const saladProteinChoiceContainer = document.getElementById('salad-protein-choice-container');
+    const saladProteinChoiceOptions = document.getElementById('salad-protein-choice-options');
+    
+    // Comuns
     const cartList = document.getElementById('cart-list');
     const checkoutSection = document.getElementById('checkout-section');
     const deliveryFeeRadios = document.querySelectorAll('input[name="deliveryFee"]');
-    const addToCartBtn = document.getElementById('add-to-cart-btn');
     const checkoutBtn = document.getElementById('checkout-btn');
     const trocoInputContainer = document.getElementById('troco-input-container'); 
     const paymentMethodSelect = document.getElementById('payment-method');
-    const proteinOptionsDiv = document.getElementById('protein-options');
 
-    // --- FUNÇÕES DE LÓGICA E RENDERIZAÇÃO INICIAL ---
+    // --- FUNÇÕES DE LÓGICA E RENDERIZAÇÃO INICIAL (Compartilhada) ---
 
     function renderOptions(container, name, options, type = 'radio', checkedValue = null, isSizeOption = false) {
         container.innerHTML = options.map((option, index) => {
@@ -230,7 +298,7 @@ fieldset:disabled {
                 labelText += `, Máx. ${option.limite} Acomp.`;
             }
 
-            const isChecked = checkedValue ? (value === checkedValue) : (index === 0 && !isSizeOption);
+            const isChecked = checkedValue ? (value === checkedValue) : (index === 0 && name !== 'proteina'); 
             
             return `
                 <label class="flex items-center p-3 bg-white rounded-lg shadow-md hover:bg-[#f7fcf6] transition duration-150 flex-1 cursor-pointer acomp-option">
@@ -243,9 +311,12 @@ fieldset:disabled {
         }).join('');
     }
     
-    function renderMolhos() {
-        renderOptions(molhoOptionsDiv, 'molho', MENU.molhos, 'checkbox');
-        molhoOptionsDiv.addEventListener('change', updateMolhoCount);
+    function renderMolhos(container, name, type) {
+        // Esta função agora só será usada para o KEBAB (molhoOptionsDiv)
+        renderOptions(container, name, MENU.molhos, type);
+        if (type === 'checkbox') {
+            container.addEventListener('change', updateMolhoCount);
+        }
     }
 
     function renderAcompanhamentos() {
@@ -253,20 +324,175 @@ fieldset:disabled {
         renderOptions(acompOptionsDiv, 'acomp', MENU.acompanhamentos, 'checkbox');
     }
     
+    // --- 🆕 FUNÇÕES DE RENDERIZAÇÃO SALADA ---
+    
+    function renderSaladOptions() {
+        saladOptionsDiv.innerHTML = MENU.saladas.map(salad => {
+            let labelText = `${salad.nome} (R$ ${salad.preco.toFixed(2).replace('.', ',')})`;
+            if (salad.isVeg) {
+                labelText += ` - VEGETARIANA`;
+            }
+            
+            const proteinasText = salad.proteinas.length > 1 && !salad.isExclusiva && !salad.isVeg ? 
+                `<span class="text-sm font-semibold text-red-700">Escolha de proteína necessária!</span>` :
+                `<span class="text-sm font-semibold text-gray-600">Proteína Inclusa: ${salad.proteinas.join(' ou ')}</span>`;
+
+            return `
+                <label class="flex flex-col p-3 bg-white rounded-lg shadow-md hover:bg-[#f7fcf6] transition duration-150 cursor-pointer">
+                    <div class="flex items-center">
+                        <input type="radio" name="saladBase" value="${salad.nome}" data-price="${salad.preco}" 
+                            class="form-radio text-red-600">
+                        <span class="ml-2 font-bold text-gray-800">${labelText}</span>
+                    </div>
+                    <p class="text-xs ml-6 text-gray-500">${salad.ingredientes}</p>
+                    <div class="ml-6 mt-1">${proteinasText}</div>
+                </label>
+            `;
+        }).join('');
+    }
+
+    function renderSaladAdicionais() {
+        saladAdicionaisOptionsDiv.innerHTML = MENU.adicionaisSalada.map(adicional => `
+            <label class="flex items-center p-3 bg-white rounded-lg shadow-sm hover:bg-[#f7fcf6] transition duration-150 flex-1 cursor-pointer">
+                <input type="checkbox" name="saladAdicional" value="${adicional.nome}" data-price="${adicional.preco}"
+                    class="form-checkbox text-red-600">
+                <span class="ml-2 font-medium">${adicional.nome} (R$ ${adicional.preco.toFixed(2).replace('.', ',')})</span>
+            </label>
+        `).join('');
+    }
+    
+    // --- SETUP PRINCIPAL ---
+
     function setupUI() {
+        // KEBAB Setup
         renderOptions(sizeOptionsDiv, 'size', MENU.tamanhos, 'radio', 'P', true);
         renderOptions(proteinOptionsDiv, 'proteina', MENU.proteinas, 'radio');
-        renderMolhos(); 
+        renderMolhos(molhoOptionsDiv, 'molho', 'checkbox'); 
         renderAcompanhamentos();
 
         sizeOptionsDiv.addEventListener('change', updateLimitAndPrice);
         acompOptionsDiv.addEventListener('change', updateAcompCount);
+
+        // SALAD Setup
+        renderSaladOptions();
+        // Não renderiza molho para Salada
+        renderSaladAdicionais();
+
+        saladOptionsDiv.addEventListener('change', updateSaladBaseSelection);
+        // Não escuta evento de molho para Salada
+        saladAdicionaisOptionsDiv.addEventListener('change', updateSaladItemPrice);
+        saladProteinChoiceOptions.addEventListener('change', updateSaladItemPrice);
+        
+        // Comum Setup
         deliveryFeeRadios.forEach(radio => radio.addEventListener('change', updateFinalSummary));
 
+        // Inicializa preços e contadores
         updateLimitAndPrice();
+        updateSaladBaseSelection(); 
         renderCart(); 
     }
     
+    // --- FUNÇÕES DE LÓGICA E CONTROLE (Salada) ---
+
+    function updateSaladBaseSelection() {
+        const selectedRadio = document.querySelector('input[name="saladBase"]:checked');
+        
+        if (selectedRadio) {
+            const baseName = selectedRadio.value;
+            selectedSaladBase = MENU.saladas.find(s => s.nome === baseName);
+
+            if (selectedSaladBase.proteinas.length > 1 && !selectedSaladBase.isExclusiva && !selectedSaladBase.isVeg) {
+                saladProteinChoiceContainer.style.display = 'block';
+                renderOptions(saladProteinChoiceOptions, 'saladProteinChoice', selectedSaladBase.proteinas, 'radio');
+                document.querySelector('input[name="saladProteinChoice"]').checked = true;
+            } else {
+                saladProteinChoiceContainer.style.display = 'none';
+                saladProteinChoiceOptions.innerHTML = '';
+            }
+        }
+        updateSaladItemPrice();
+    }
+    
+    function updateSaladItemPrice() {
+        if (!selectedSaladBase) return; 
+
+        let basePrice = selectedSaladBase.preco;
+        let adicionaisPrice = 0;
+        
+        document.querySelectorAll('input[name="saladAdicional"]:checked').forEach(cb => {
+            const price = parseFloat(cb.dataset.price);
+            adicionaisPrice += price;
+        });
+
+        currentSaladPrice = basePrice + adicionaisPrice;
+        saladPriceDisplay.textContent = `R$ ${currentSaladPrice.toFixed(2).replace('.', ',')}`;
+    }
+
+    function resetSaladForm() {
+        // Removido reset de molho
+        document.querySelectorAll('input[name="saladAdicional"]').forEach(cb => cb.checked = false);
+        document.getElementById('salad-obs').value = '';
+        
+        document.querySelector('input[name="saladBase"]').checked = true;
+        updateSaladBaseSelection();
+    }
+
+    function addSaladToCart() {
+        addSaladToCartBtn.disabled = true; 
+        addSaladToCartBtn.textContent = 'Adicionando...';
+        
+        const baseSalad = document.querySelector('input[name="saladBase"]:checked');
+        // const molhoSalad = document.querySelector('input[name="saladMolho"]:checked'); // Removido
+        const adicionaisCheckboxes = document.querySelectorAll('input[name="saladAdicional"]:checked');
+        const proteinChoice = document.querySelector('input[name="saladProteinChoice"]:checked');
+
+        if (!baseSalad) { // Agora só verifica a Salada Base
+            showModal('Por favor, selecione a **Salada Base**.', 'bg-red-500');
+            addSaladToCartBtn.disabled = false;
+            addSaladToCartBtn.textContent = 'ADICIONAR SALADA AO CARRINHO';
+            return;
+        }
+
+        const baseItem = MENU.saladas.find(s => s.nome === baseSalad.value);
+        let finalProtein = '';
+
+        if (baseItem.proteinas.length > 1 && !baseItem.isExclusiva && !baseItem.isVeg) {
+            if (!proteinChoice) {
+                showModal('Por favor, escolha a **Proteína** para a salada.', 'bg-red-500');
+                addSaladToCartBtn.disabled = false;
+                addSaladToCartBtn.textContent = 'ADICIONAR SALADA AO CARRINHO';
+                return;
+            }
+            finalProtein = proteinChoice.value;
+        } else {
+            finalProtein = baseItem.proteinas.join(' ou ');
+        }
+
+
+        const saladData = {
+            type: 'Salada', 
+            nome: baseSalad.value,
+            price: currentSaladPrice,
+            molho: '(Acompanha molho)', // Molho fixo/descrição
+            adicionais: Array.from(adicionaisCheckboxes).map(cb => cb.value),
+            obs: document.getElementById('salad-obs').value.trim(),
+            proteina: finalProtein 
+        };
+        
+        cart.push(saladData);
+        showModal(`Salada ${saladData.nome} adicionada ao carrinho!`, 'bg-red-500');
+        renderCart();
+        resetSaladForm();
+
+        setTimeout(() => {
+            addSaladToCartBtn.disabled = false;
+            addSaladToCartBtn.textContent = 'ADICIONAR SALADA AO CARRINHO';
+            document.getElementById('checkout-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } , 300); 
+    }
+
+    // --- FUNÇÕES DE LÓGICA E CONTROLE (Kebab) ---
+
     function toggleTrocoField() {
         const isMoney = paymentMethodSelect.value === 'Dinheiro';
         trocoInputContainer.style.display = isMoney ? 'block' : 'none';
@@ -307,7 +533,7 @@ fieldset:disabled {
         const selectedSizeId = document.querySelector('input[name="size"]:checked').value;
         const basePrice = MENU.tamanhos.find(t => t.id === selectedSizeId)?.preco || 0;
         
-        premiumPrice = 0;
+        premiumPrice = 0; 
         
         currentItemPrice = basePrice + premiumPrice;
         itemPriceDisplay.textContent = `R$ ${currentItemPrice.toFixed(2).replace('.', ',')}`;
@@ -339,8 +565,16 @@ fieldset:disabled {
         const molhoCheckboxes = document.querySelectorAll('input[name="molho"]:checked'); 
         const acompCheckboxes = document.querySelectorAll('input[name="acomp"]:checked');
         
-        if (!sizeRadio || !proteinaRadio || molhoCheckboxes.length === 0 || acompCheckboxes.length === 0) {
-            showModal('Por favor, selecione o **Tamanho**, **1 Proteína**, pelo menos **1 Molho** e **1 Acompanhamento**.', 'bg-red-500');
+        if (!sizeRadio || !proteinaRadio) {
+            showModal('Por favor, selecione o **Tamanho** e **1 Proteína**.', 'bg-red-500');
+            return null;
+        }
+        if (molhoCheckboxes.length === 0) {
+            showModal('Por favor, selecione pelo menos **1 Molho**.', 'bg-red-500');
+            return null;
+        }
+        if (acompCheckboxes.length === 0) {
+            showModal('Por favor, selecione pelo menos **1 Acompanhamento**.', 'bg-red-500');
             return null;
         }
         if (molhoCheckboxes.length > MENU.maxMolhos) {
@@ -349,6 +583,7 @@ fieldset:disabled {
         }
 
         const customItem = {
+            type: 'Kebab', 
             size: sizeRadio.value,
             price: currentItemPrice,
             proteina: proteinaRadio.value, 
@@ -392,7 +627,7 @@ fieldset:disabled {
         updateLimitAndPrice(); 
     }
 
-    // --- FUNÇÕES DE CARRINHO E TOTALIZAÇÃO ---
+    // --- FUNÇÕES DE CARRINHO E TOTALIZAÇÃO (Universal) ---
 
     function renderCart() {
         cartList.innerHTML = '';
@@ -406,21 +641,41 @@ fieldset:disabled {
                 const li = document.createElement('li');
                 li.className = 'p-3 border border-gray-100 bg-white rounded-lg shadow-sm space-y-1';
                 
-                const molhoList = item.molhos.join(', ');
-                const acompList = item.acompanhamentos.length > 0 ? item.acompanhamentos.join(', ') : 'Nenhum';
+                if (item.type === 'Salada') {
+                    const adicionaisList = item.adicionais?.length > 0 ? item.adicionais.join(', ') : 'Nenhum';
+                    const proteinDisplay = item.proteina.includes('ou') ? `Opções Inclusas: ${item.proteina}` : `Proteína: ${item.proteina}`;
+
+                    li.innerHTML = `
+                        <div class="flex justify-between items-center bg-red-50 p-2 rounded-md">
+                            <h3 class="font-bold text-red-800">#${index + 1} - 🥗 SALADA ${item.nome}</h3>
+                            <button onclick="removeItem(${index})" class="text-red-500 hover:text-red-700 text-sm font-semibold transition duration-150">
+                                Remover
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-600">${proteinDisplay}</p>
+                        <p class="text-sm text-gray-600 font-bold text-red-700">Molho: ${item.molho}</p>
+                        <p class="text-sm text-red-600 font-semibold">Adicionais: ${adicionaisList}</p>
+                        <p class="text-sm text-gray-600 italic">Obs: ${item.obs || 'Nenhuma'}</p>
+                        <p class="text-lg font-extrabold text-red-700 text-right">R$ ${item.price.toFixed(2).replace('.', ',')}</p>
+                    `;
+                } else {
+                    const molhoList = item.molhos.join(', ');
+                    const acompList = item.acompanhamentos.length > 0 ? item.acompanhamentos.join(', ') : 'Nenhum';
+                    
+                    li.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold text-gray-800">#${index + 1} - 🥙 Kebab ${item.size} (${item.proteina})</h3>
+                            <button onclick="removeItem(${index})" class="text-red-500 hover:text-red-700 text-sm font-semibold transition duration-150">
+                                Remover
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-600">Molhos Selecionados: ${molhoList}</p>
+                        <p class="text-sm text-gray-600">Acompanhamentos: ${acompList}</p>
+                        <p class="text-sm text-gray-600 italic">Obs: ${item.obs || 'Nenhuma'}</p>
+                        <p class="text-lg font-extrabold text-green-700 text-right">R$ ${item.price.toFixed(2).replace('.', ',')}</p>
+                    `;
+                }
                 
-                li.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <h3 class="font-bold text-gray-800">#${index + 1} - Kebab ${item.size} (${item.proteina})</h3>
-                        <button onclick="removeItem(${index})" class="text-red-500 hover:text-red-700 text-sm font-semibold transition duration-150">
-                            Remover
-                        </button>
-                    </div>
-                    <p class="text-sm text-gray-600">Molhos Selecionados: ${molhoList}</p>
-                    <p class="text-sm text-gray-600">Acompanhamentos: ${acompList}</p>
-                    <p class="text-sm text-gray-600 italic">Obs: ${item.obs || 'Nenhuma'}</p>
-                    <p class="text-lg font-extrabold text-green-700 text-right">R$ ${item.price.toFixed(2).replace('.', ',')}</p>
-                `;
                 cartList.appendChild(li);
             });
         }
@@ -440,7 +695,7 @@ fieldset:disabled {
     function removeItem(index) {
         cart.splice(index, 1); 
         renderCart();
-        showModal('Kebab removido do carrinho.', 'bg-yellow-600');
+        showModal('Item removido do carrinho.', 'bg-yellow-600');
     }
 
     function getDeliveryFee() {
@@ -484,23 +739,36 @@ fieldset:disabled {
         const troco = document.getElementById('troco').value.trim();
         const referencia = document.getElementById('referencia').value.trim();
 
-        let message = `*PEDIDO MOVITA - MONTE SEU KEBAB*\n\n`;
+        let message = `*PEDIDO MOVITA - Múltiplos Itens*\n\n`; 
         message += `====================================\n`;
 
-        // ITENS MONTADOS (DESTACADO EM NEGRITO)
-        message += `*🥙 ITENS MONTADOS (${cart.length}x):*\n`;
+        message += `*📝 DETALHES DOS ITENS (${cart.length}x):*\n`;
+        
         cart.forEach((item, index) => {
-            const molhoList = item.molhos.join(', ');
-            const acompList = item.acompanhamentos.join(', ');
+            if (item.type === 'Salada') {
+                const adicionaisList = item.adicionais?.join(', ') || 'Nenhum';
+                const proteinDisplay = item.proteina.includes('ou') ? `Opção Inclusa: ${item.proteina}` : item.proteina; 
+                
+                message += `\n*#${index + 1} - 🥗 SALADA ${item.nome} (R$ ${item.price.toFixed(2).replace('.', ',')})*\n`;
+                message += `*-> Proteína: ${proteinDisplay}*\n`;
+                message += `*-> Molho: ${item.molho}*\n`; // Usará a descrição fixa
+                if (item.adicionais?.length > 0) {
+                    message += `*-> Adicionais: ${adicionaisList}*\n`;
+                }
+            } else {
+                const molhoList = item.molhos.join(', ');
+                const acompList = item.acompanhamentos.join(', ');
+                
+                message += `\n*#${index + 1} - 🥙 Kebab ${item.size} (${item.proteina}) (R$ ${item.price.toFixed(2).replace('.', ',')})*\n`;
+                message += `*-> Molhos: ${molhoList}*\n`;
+                message += `*-> Acompanhamentos: ${acompList}*\n`;
+            }
 
-            // TODO o bloco do item em negrito
-            message += `\n*#${index + 1} - Kebab ${item.size} (${item.proteina}) (R$ ${item.price.toFixed(2).replace('.', ',')})*\n`;
-            message += `*-> Molhos: ${molhoList}*\n`;
-            message += `*-> Acompanhamentos: ${acompList}*\n`;
             if (item.obs) {
                 message += `*-> Obs: ${item.obs}*\n`;
             }
         });
+
 
         // Resumo de Valores
         message += `\n====================================\n`;
@@ -554,10 +822,10 @@ fieldset:disabled {
         }, 3000);
     }
 
-    // Inicialização
+    // Inicialização e Exportação de Funções
     window.onload = setupUI;
-    // Exporta funções para uso global (inline onclick, onchange)
     window.addToCart = addToCart;
+    window.addSaladToCart = addSaladToCart; 
     window.removeItem = removeItem;
     window.generateWhatsAppLink = generateWhatsAppLink;
     window.toggleTrocoField = toggleTrocoField;
