@@ -57,41 +57,6 @@ fieldset:disabled {
 
     <div class="p-6 space-y-6 md:p-8 pt-0">
         
-        <section id="salad-order-section" class="space-y-6 p-4 border border-[#e5f0e1] rounded-xl bg-[#f7fcf6]">
-            <h2 class="section-title text-[#4a5540]">🥗 Monte Sua Salada</h2>
-
-            <div class="space-y-2">
-                <label class="block font-semibold text-gray-700">1. Escolha a Salada Base *(Acompanha Molho)*</label>
-                <div id="salad-options" class="space-y-2">
-                    </div>
-            </div>
-            
-            <div id="salad-protein-choice-container" class="space-y-2 border-t pt-4 border-[#aec6a2]" style="display:none;">
-                <label class="block font-semibold text-gray-700">1.5. Escolha a Proteína Inclusa na Salada</label>
-                <div id="salad-protein-choice-options" class="grid grid-cols-2 gap-2">
-                    </div>
-            </div>
-            
-            <div class="space-y-2 border-t pt-4 border-[#aec6a2]">
-                <label class="block font-semibold text-gray-700">2. Adicionais (Opcional)</label>
-                <div id="salad-adicionais-options" class="grid grid-cols-2 gap-2">
-                    </div>
-            </div>
-
-            <div class="space-y-2">
-                <label for="salad-obs" class="block font-semibold text-gray-700 border-t pt-4">3. Observações</label>
-                <input type="text" id="salad-obs" class="input-style" placeholder="Ex: Sem cebola roxa, molho a parte">
-                <p class="text-2xl font-extrabold text-red-700 mt-4 text-right">
-                    Preço da Salada: <span id="salad-price-display">R$ 0,00</span>
-                </p>
-            </div>
-            
-            <button id="add-salad-to-cart-btn" onclick="addSaladToCart()" 
-                class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-md transition duration-300 transform hover:scale-[1.01] active:scale-[0.98]">
-                ADICIONAR SALADA AO CARRINHO
-            </button>
-        </section>
-        
         <section id="custom-order-section" class="space-y-6 p-4 border border-[#e5f0e1] rounded-xl bg-[#f7fcf6]">
             <h2 class="section-title text-[#4a5540]">🥙 Monte Seu Kebab</h2>
 
@@ -130,6 +95,41 @@ fieldset:disabled {
             <button id="add-to-cart-btn" onclick="addToCart()" 
                 class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg shadow-md transition duration-300 transform hover:scale-[1.01] active:scale-[0.98]">
                 ADICIONAR PRATO AO CARRINHO E MONTAR OUTRO
+            </button>
+        </section>
+        
+        <section id="salad-order-section" class="space-y-6 p-4 border border-[#e5f0e1] rounded-xl bg-[#f7fcf6]">
+            <h2 class="section-title text-[#4a5540]">🥗 Monte Sua Salada</h2>
+
+            <div class="space-y-2">
+                <label class="block font-semibold text-gray-700">1. Escolha a Salada Base *(Acompanha Molho)*</label>
+                <div id="salad-options" class="space-y-2">
+                    </div>
+            </div>
+            
+            <div id="salad-protein-choice-container" class="space-y-2 border-t pt-4 border-[#aec6a2]" style="display:none;">
+                <label class="block font-semibold text-gray-700">1.5. Escolha a Proteína Inclusa na Salada</label>
+                <div id="salad-protein-choice-options" class="grid grid-cols-2 gap-2">
+                    </div>
+            </div>
+            
+            <div class="space-y-2 border-t pt-4 border-[#aec6a2]">
+                <label class="block font-semibold text-gray-700">2. Adicionais (Opcional)</label>
+                <div id="salad-adicionais-options" class="grid grid-cols-2 gap-2">
+                    </div>
+            </div>
+
+            <div class="space-y-2">
+                <label for="salad-obs" class="block font-semibold text-gray-700 border-t pt-4">3. Observações</label>
+                <input type="text" id="salad-obs" class="input-style" placeholder="Ex: Sem cebola roxa, molho a parte">
+                <p class="text-2xl font-extrabold text-red-700 mt-4 text-right">
+                    Preço da Salada: <span id="salad-price-display">R$ 0,00</span>
+                </p>
+            </div>
+            
+            <button id="add-salad-to-cart-btn" onclick="addSaladToCart()" 
+                class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-md transition duration-300 transform hover:scale-[1.01] active:scale-[0.98]">
+                ADICIONAR SALADA AO CARRINHO
             </button>
         </section>
 
@@ -297,8 +297,7 @@ fieldset:disabled {
                 labelText += `, Máx. ${option.limite} Acomp.`;
             }
 
-            // MUDANÇA AQUI: Pré-selecionar SOMENTE o tamanho 'P' para o Kebab (para definir o preço inicial).
-            // Nenhuma outra opção (proteína, salada base) será pré-selecionada.
+            // Pré-selecionar SOMENTE o tamanho 'P' para o Kebab (para definir o preço inicial).
             const isChecked = (isSizeOption && index === 0) || (checkedValue && value === checkedValue);
             
             return `
@@ -327,7 +326,7 @@ fieldset:disabled {
     // --- FUNÇÕES DE RENDERIZAÇÃO SALADA ---
     
     function renderSaladOptions() {
-        // Usa renderOptions, mas não passa checkedValue, então nada é checado
+        // Nenhuma pré-selecionada
         saladOptionsDiv.innerHTML = MENU.saladas.map(salad => {
             let labelText = `${salad.nome} (R$ ${salad.preco.toFixed(2).replace('.', ',')})`;
             if (salad.isVeg) {
@@ -353,7 +352,7 @@ fieldset:disabled {
     }
 
     function renderSaladAdicionais() {
-        // Já usa checkbox, que não são pré-selecionados por padrão
+        // Nenhuma pré-selecionada
         saladAdicionaisOptionsDiv.innerHTML = MENU.adicionaisSalada.map(adicional => `
             <label class="flex items-center p-3 bg-white rounded-lg shadow-sm hover:bg-[#f7fcf6] transition duration-150 flex-1 cursor-pointer">
                 <input type="checkbox" name="saladAdicional" value="${adicional.nome}" data-price="${adicional.preco}"
@@ -388,8 +387,7 @@ fieldset:disabled {
 
         // Inicializa preços e contadores
         updateLimitAndPrice();
-        // Não chama updateSaladBaseSelection() ou updateSaladItemPrice() no setup, forçando o preço inicial para R$ 0,00
-        saladPriceDisplay.textContent = 'R$ 0,00';
+        saladPriceDisplay.textContent = 'R$ 0,00'; // Preço da salada inicial é R$ 0,00
         renderCart(); 
     }
     
