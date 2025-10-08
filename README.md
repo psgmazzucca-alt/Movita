@@ -236,10 +236,10 @@ fieldset:disabled {
             { nome: "Camarão", preco: 12.00 }
         ],
 
-        whatsappNumber: "5517997381858",
+        whatsappNumber: "5592984184000",
         pixData: { 
-            name: "SUÉLEM CRISTINA MAESTRE MAZZUCCA",
-            key: "41756000867 (CPF)" 
+            name: "Falcão Assessoria Esportiva",
+            key: "92984184000 (TELEFONE)" 
         }
     };
 
