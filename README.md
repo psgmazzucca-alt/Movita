@@ -236,7 +236,7 @@ fieldset:disabled {
             { nome: "Camarão", preco: 12.00 }
         ],
 
-        whatsappNumber: "5592984184000",
+        whatsappNumber: "5517997381858",
         pixData: { 
             name: "Falcão Assessoria Esportiva",
             key: "92984184000 (TELEFONE)" 
